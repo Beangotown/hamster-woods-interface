@@ -40,7 +40,7 @@
     "graphql": "^16.8.0",
     "graphql-request": "^6.1.0",
     "lottie-react": "^2.4.0",
-    "next": "14.2.4",
+    "next": "13.4.4",
     "next-babel-conditional-ssg-ssr": "^1.0.0",
     "next-compose-plugins": "^2.2.1",
     "next-redux-wrapper": "^8.1.0",
