@@ -71,49 +71,46 @@ function GoButton({
     changeCurDiceCountFn.current = changeCurDiceCount;
   }, [changeCurDiceCount]);
 
-  const statusCom: Record<Status, ReactElement> = useMemo(
-    () => ({
-      [Status.NONE]: (
-        <>
-          <span
-            className={`font-paytone font-[500] tracking-tight text-[#fff] text-stroke-[#52300B] ${
-              isMobile ? 'text-[48px] leading-[48px] mt-[10px]' : 'text-[72px] leading-[72px] mb-[4px]'
-            }`}>
-            HOP
-          </span>
-          <span
-            className={`${
-              isMobile ? 'text-[10px] leading-[10px] mt-[10px]' : 'text-[18px] leading-[18px] mt-[4px]'
-            } font-bold text-[#52300B]`}>
-            {`free: ${playableCount}/${dailyPlayableCount} Paid: ${purchasedChancesCount}`}
-          </span>
-        </>
-      ),
-      [Status.LOADING]: (
-        <div className={`${styles['button__icon__loading']} ${isMobile ? 'mt-[10px] w-[45px]' : 'mt-[16px] w-[85px]'}`}>
-          <div className={styles['button__icon__loading__bounce1']}></div>
-          <div className={styles['button__icon__loading__bounce2']}></div>
-        </div>
-      ),
-      [Status.DISABLED]: (
-        <>
-          <span
-            className={`font-paytone font-[500] tracking-tight text-[#fff] text-stroke-[#8E8E8E] ${
-              isMobile ? 'text-[48px] leading-[48px] mt-[10px]' : 'text-[72px] leading-[72px] mb-[4px]'
-            }`}>
-            HOP
-          </span>
-          <span
-            className={`${
-              isMobile ? 'text-[10px] leading-[10px] mt-[10px]' : 'text-[21px] leading-[21px] mt-[4px]'
-            } font-bold text-[#8E8E8E]`}>
-            {`free: ${playableCount}/${dailyPlayableCount} Paid: ${purchasedChancesCount}`}
-          </span>
-        </>
-      ),
-    }),
-    [dailyPlayableCount, isMobile, playableCount, purchasedChancesCount],
-  );
+  const statusCom: Record<Status, ReactElement> = {
+    [Status.NONE]: (
+      <>
+        <span
+          className={`font-paytone font-[500] tracking-tight text-[#fff] text-stroke-[#52300B] ${
+            isMobile ? 'text-[48px] leading-[48px] mt-[10px]' : 'text-[72px] leading-[72px] mb-[4px]'
+          }`}>
+          HOP
+        </span>
+        <span
+          className={`${
+            isMobile ? 'text-[10px] leading-[10px] mt-[10px]' : 'text-[18px] leading-[18px] mt-[4px]'
+          } font-bold text-[#52300B]`}>
+          {`free: ${playableCount}/${dailyPlayableCount} Paid: ${purchasedChancesCount}`}
+        </span>
+      </>
+    ),
+    [Status.LOADING]: (
+      <div className={`${styles['button__icon__loading']} ${isMobile ? 'mt-[10px] w-[45px]' : 'mt-[16px] w-[85px]'}`}>
+        <div className={styles['button__icon__loading__bounce1']}></div>
+        <div className={styles['button__icon__loading__bounce2']}></div>
+      </div>
+    ),
+    [Status.DISABLED]: (
+      <>
+        <span
+          className={`font-paytone font-[500] tracking-tight text-[#fff] text-stroke-[#8E8E8E] ${
+            isMobile ? 'text-[48px] leading-[48px] mt-[10px]' : 'text-[72px] leading-[72px] mb-[4px]'
+          }`}>
+          HOP
+        </span>
+        <span
+          className={`${
+            isMobile ? 'text-[10px] leading-[10px] mt-[10px]' : 'text-[21px] leading-[21px] mt-[4px]'
+          } font-bold text-[#8E8E8E]`}>
+          {`free: ${playableCount}/${dailyPlayableCount} Paid: ${purchasedChancesCount}`}
+        </span>
+      </>
+    ),
+  };
 
   const chooseDiceCount = (number: number) => {
     changeCurDiceCount && changeCurDiceCount(number);
