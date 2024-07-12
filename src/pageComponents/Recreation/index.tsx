@@ -81,6 +81,9 @@ export default function Game() {
 
   const [beanPassInfoDto, setBeanPassInfoDto] = useState<IBeanPassListItem | undefined>(curBeanPass);
 
+  const timer = useRef<any>(null);
+  const [initialized, setInitialized] = useState<boolean>(false);
+
   const firstNode = checkerboardData![5][4];
   const firstNodePosition: [number, number] = [5, 4];
   const linkedList = useRef<CheckerboardList>();
@@ -141,6 +144,13 @@ export default function Game() {
     x: 0,
     y: 0,
   });
+
+  useEffect(() => {
+    timer.current = setTimeout(() => {
+      setInitialized(true);
+    }, 2000);
+    return timer.current && clearTimeout(timer.current);
+  }, []);
 
   const updateStep = () => {
     store.dispatch(
@@ -641,7 +651,7 @@ export default function Game() {
           </BoardRight>
         )}
 
-        {isMobile && (
+        {isMobile && initialized && (
           <GoButton
             playableCount={playableCount}
             dailyPlayableCount={hasNft ? playerInfo?.dailyPlayableCount : 0}
