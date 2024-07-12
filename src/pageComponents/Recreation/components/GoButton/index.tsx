@@ -1,4 +1,4 @@
-import React, { ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { ReactElement, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import styles from './index.module.css';
 import useGetState from 'redux/state/useGetState';
@@ -42,7 +42,7 @@ function GoButton({
   const { isMobile } = useGetState();
 
   const diceCount = [1, 2, 3];
-
+  const [, resetOverlayCount] = useState(0);
   const [curPress, setCurPress] = useState<number | null>(null);
   const [curTouch, setCurTouch] = useState<number | null>(null);
 
@@ -213,6 +213,10 @@ function GoButton({
       mobileChanceButton.removeEventListener('mouseup', handleReleaseChance);
     };
   }, [changeChance, handleReleaseChance, isMobile]);
+
+  useLayoutEffect(() => {
+    resetOverlayCount((pre) => pre + 1);
+  }, []);
 
   return (
     <div className={`${styles[isMobile ? 'button-mobile' : 'button']} relative w-full items-center`}>
