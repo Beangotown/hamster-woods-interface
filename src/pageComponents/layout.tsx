@@ -31,6 +31,8 @@ import { setChessboardData } from 'redux/reducer/chessboardData';
 import { setNoticeModal } from 'redux/reducer/noticeModal';
 import { convertToUtcTimestamp } from 'hooks/useCountDown';
 import { setServerConfigInfo } from 'redux/reducer/serverConfigInfo';
+import 'utils/vconsole';
+import { initVConsole } from 'utils/vconsole';
 
 export const isCurrentTimeInterval = (date: [string, string]) => {
   const startTime = new Date(date[0]).getTime();
@@ -55,6 +57,10 @@ const Layout = dynamic(
 
       useEffect(() => {
         TelegramPlatform.initializeTelegramWebApp({ handleLogout: handleSDKLogout });
+      }, []);
+
+      useEffect(() => {
+        initVConsole();
       }, []);
 
       useEffect(() => {
