@@ -149,7 +149,7 @@ export default function Game() {
     timer.current = setTimeout(() => {
       setInitialized(true);
     }, 2000);
-    return timer.current && clearTimeout(timer.current);
+    return () => timer.current && clearTimeout(timer.current);
   }, []);
 
   const updateStep = () => {
