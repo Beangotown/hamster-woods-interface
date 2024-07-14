@@ -275,15 +275,7 @@ function GoButton({
               src={require('assets/images/goButton/go-btn-border.png').default.src}
               alt="border"
             />
-            <div
-              style={{
-                backgroundImage: `url(${
-                  require(`assets/images/btn/${
-                    mBtnPress ? 'bg-go-press-m' : status === Status.DISABLED ? 'bg-go-disabled-m' : 'bg-go-default-m'
-                  }.png`).default.src
-                })`,
-              }}
-              className={`${styles['btn-mobile']} ${styles['button__icon']} cursor-custom relative flex !left-[-22px] !bottom-[11px]`}>
+            <div className={`${styles['btn-mobile']} ${styles['button__icon']} cursor-custom `}>
               <div
                 style={{
                   backgroundImage: `url(${
@@ -302,13 +294,16 @@ function GoButton({
               </div>
               <div
                 ref={mobileGoButtonRef}
+                style={{
+                  backgroundImage: `url(${
+                    require(`assets/images/btn/${
+                      mBtnPress ? 'bg-go-press-m' : status === Status.DISABLED ? 'bg-go-disabled-m' : 'bg-go-default-m'
+                    }.png`).default.src
+                  })`,
+                }}
                 className={`${mBtnPress ? 'top-[4px]' : ''} ${
-                  status === Status.LOADING
-                    ? 'top-[12px] left-[64px]'
-                    : isMobile
-                    ? 'left-[2.2rem]'
-                    : 'left-[54px] top-0'
-                } absolute flex flex-col w-fit h-fit items-center relative justify-center`}>
+                  status === Status.LOADING ? 'top-[12px] left-[64px]' : 'left-[0]'
+                }  ${styles['hop-mobile']}`}>
                 {mBtnPress && status === Status.NONE && <div className={styles['btn-mobile-mask']}></div>}
                 {statusCom[status]}
               </div>

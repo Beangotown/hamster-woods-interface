@@ -5,19 +5,25 @@
     @apply w-full h-[106px] bg-[100%_100%] bg-no-repeat;
   }
   .dice-number-mobile {
-    @apply w-[71px] h-[71px] flex justify-center absolute right-[-76px] top-[24px] z-[51] bg-[100%_100%] bg-no-repeat;
+    @apply w-[97px] h-[80px] pl-[16px] pb-[16px] flex justify-center z-[51] bg-[100%_100%] bg-no-repeat;
 
     background-size: cover;
   }
 
   .get-chance-mobile {
-    @apply w-[71px] h-[71px] flex justify-center absolute left-[-58px] top-[24px] z-[51] bg-[100%_100%] bg-no-repeat;
+    @apply w-[97px] h-[80px] pl-[16px] pb-[16px] flex justify-center  z-[51] bg-[100%_100%] bg-no-repeat;
+
+    background-size: cover;
+  }
+
+  .hop-mobile {
+    @apply relative flex flex-col justify-center  w-[176px] h-[140px] pl-[24px] pb-[48px] items-center  z-[51] bg-[100%_100%] bg-no-repeat;
 
     background-size: cover;
   }
 
   .purchase-text-mobile {
-    -webkit-text-stroke: 0.5px #52300B !important;
+    -webkit-text-stroke: 0.5px #52300b !important;
   }
 
   .dice-content-mobile-mask {
@@ -58,10 +64,10 @@
 }
 
 .btn-mobile {
-  @apply bg-no-repeat bg-contain w-[150px] h-[120px] z-[50];
+  @apply !absolute !left-0 !right-[16px] !bottom-0 !top-[-24px] flex flex-row justify-center items-center;
 
   .btn-mobile-mask {
-    @apply absolute w-[130px] h-[100px] top-0 left-[-14px] rounded-[38px] z-[10];
+    @apply absolute w-[145px] h-[110px] top-[4px] right-[4px] rounded-[38px] z-[10];
 
     background-color: rgb(82 48 11 / 30%);
   }
