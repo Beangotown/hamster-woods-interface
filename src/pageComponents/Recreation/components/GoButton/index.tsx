@@ -270,7 +270,7 @@ function GoButton({
               src={require('assets/images/goButton/go-btn-border.png').default.src}
               alt="border"
             />
-            <div className={`${styles['btn-mobile']} ${styles['button__icon']} cursor-custom `}>
+            <div className={`${styles['btn-mobile']} cursor-custom `}>
               <div className="text-[48px]">hi!</div>
               {/* <div
                 ref={mobileChanceButtonRef}
