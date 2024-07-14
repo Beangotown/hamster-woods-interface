@@ -282,7 +282,7 @@ function GoButton({
                   Purchase chance
                 </div>
               </div> */}
-              <div
+              {/* <div
                 ref={mobileGoButtonRef}
                 className={`${mBtnPress ? 'top-[4px]' : ''} ${
                   status === Status.LOADING ? 'top-[12px] left-[64px]' : 'left-[0]'
@@ -300,7 +300,7 @@ function GoButton({
                     curPressM === curDiceCount && styles['dice-content-mobile-press']
                   }`}
                 />
-              </div>
+              </div> */}
             </div>
           </div>
         ) : (
