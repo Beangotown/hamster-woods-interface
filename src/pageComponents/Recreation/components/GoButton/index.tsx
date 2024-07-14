@@ -271,7 +271,8 @@ function GoButton({
               alt="border"
             />
             <div className={`${styles['btn-mobile']} ${styles['button__icon']} cursor-custom `}>
-              <div
+              <div className="text-[48px]">hi!</div>
+              {/* <div
                 ref={mobileChanceButtonRef}
                 className={`relative ${styles['get-chance-mobile']} ${chanceBtnPressM ? 'top-[5px]' : ''}`}>
                 {chanceBtnPressM && <div className={styles['dice-content-mobile-mask']}></div>}
@@ -280,7 +281,7 @@ function GoButton({
                   className={`${styles['purchase-text-mobile']} text-white font-paytone w-[48px] mt-[12px] ml-[0.4rem] text-center text-[11px] !text-stroke-[#52300B]`}>
                   Purchase chance
                 </div>
-              </div>
+              </div> */}
               <div
                 ref={mobileGoButtonRef}
                 className={`${mBtnPress ? 'top-[4px]' : ''} ${
