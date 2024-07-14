@@ -163,55 +163,55 @@ function GoButton({
   }, []);
 
   // Handle both touch and mouse events to support interaction in Telegram WebApp on PC
-  // useEffect(() => {
-  //   const mobileGoButton = mobileGoButtonRef.current;
-  //   if (!mobileGoButton) return;
-  //   mobileGoButton.addEventListener('mousedown', handlePressGoButton);
-  //   mobileGoButton.addEventListener('mouseup', handleReleaseGoButton);
-  //   mobileGoButton.addEventListener('touchstart', handlePressGoButton, { passive: false });
-  //   mobileGoButton.addEventListener('touchend', handleReleaseGoButton);
+  useEffect(() => {
+    const mobileGoButton = mobileGoButtonRef.current;
+    if (!mobileGoButton) return;
+    mobileGoButton.addEventListener('mousedown', handlePressGoButton);
+    mobileGoButton.addEventListener('mouseup', handleReleaseGoButton);
+    mobileGoButton.addEventListener('touchstart', handlePressGoButton, { passive: false });
+    mobileGoButton.addEventListener('touchend', handleReleaseGoButton);
 
-  //   return () => {
-  //     mobileGoButton.removeEventListener('touchstart', handlePressGoButton);
-  //     mobileGoButton.removeEventListener('mousedown', handlePressGoButton);
-  //     mobileGoButton.removeEventListener('touchend', handleReleaseGoButton);
-  //     mobileGoButton.removeEventListener('mouseup', handleReleaseGoButton);
-  //   };
-  // }, [handlePressGoButton, handleReleaseGoButton, isMobile]);
+    return () => {
+      mobileGoButton.removeEventListener('touchstart', handlePressGoButton);
+      mobileGoButton.removeEventListener('mousedown', handlePressGoButton);
+      mobileGoButton.removeEventListener('touchend', handleReleaseGoButton);
+      mobileGoButton.removeEventListener('mouseup', handleReleaseGoButton);
+    };
+  }, [handlePressGoButton, handleReleaseGoButton, isMobile]);
 
-  // // Handle both touch and mouse events to support interaction in Telegram WebApp on PC
-  // useEffect(() => {
-  //   const mobileDiceButton = mobileDiceButtonRef.current;
-  //   if (!mobileDiceButton) return;
-  //   mobileDiceButton.addEventListener('mousedown', changeDiceCount);
-  //   mobileDiceButton.addEventListener('mouseup', handleReleaseDice);
-  //   mobileDiceButton.addEventListener('touchstart', changeDiceCount, { passive: false });
-  //   mobileDiceButton.addEventListener('touchend', handleReleaseDice);
+  // Handle both touch and mouse events to support interaction in Telegram WebApp on PC
+  useEffect(() => {
+    const mobileDiceButton = mobileDiceButtonRef.current;
+    if (!mobileDiceButton) return;
+    mobileDiceButton.addEventListener('mousedown', changeDiceCount);
+    mobileDiceButton.addEventListener('mouseup', handleReleaseDice);
+    mobileDiceButton.addEventListener('touchstart', changeDiceCount, { passive: false });
+    mobileDiceButton.addEventListener('touchend', handleReleaseDice);
 
-  //   return () => {
-  //     mobileDiceButton.removeEventListener('touchstart', changeDiceCount);
-  //     mobileDiceButton.removeEventListener('mousedown', changeDiceCount);
-  //     mobileDiceButton.removeEventListener('touchend', handleReleaseDice);
-  //     mobileDiceButton.removeEventListener('mouseup', handleReleaseDice);
-  //   };
-  // }, [changeDiceCount, handleReleaseDice, isMobile]);
+    return () => {
+      mobileDiceButton.removeEventListener('touchstart', changeDiceCount);
+      mobileDiceButton.removeEventListener('mousedown', changeDiceCount);
+      mobileDiceButton.removeEventListener('touchend', handleReleaseDice);
+      mobileDiceButton.removeEventListener('mouseup', handleReleaseDice);
+    };
+  }, [changeDiceCount, handleReleaseDice, isMobile]);
 
-  // // Handle both touch and mouse events to support interaction in Telegram WebApp on PC
-  // useEffect(() => {
-  //   const mobileChanceButton = mobileChanceButtonRef.current;
-  //   if (!mobileChanceButton) return;
-  //   mobileChanceButton.addEventListener('mousedown', changeChance);
-  //   mobileChanceButton.addEventListener('mouseup', handleReleaseChance);
-  //   mobileChanceButton.addEventListener('touchstart', changeChance, { passive: false });
-  //   mobileChanceButton.addEventListener('touchend', handleReleaseChance);
+  // Handle both touch and mouse events to support interaction in Telegram WebApp on PC
+  useEffect(() => {
+    const mobileChanceButton = mobileChanceButtonRef.current;
+    if (!mobileChanceButton) return;
+    mobileChanceButton.addEventListener('mousedown', changeChance);
+    mobileChanceButton.addEventListener('mouseup', handleReleaseChance);
+    mobileChanceButton.addEventListener('touchstart', changeChance, { passive: false });
+    mobileChanceButton.addEventListener('touchend', handleReleaseChance);
 
-  //   return () => {
-  //     mobileChanceButton.removeEventListener('touchstart', changeChance);
-  //     mobileChanceButton.removeEventListener('mousedown', changeChance);
-  //     mobileChanceButton.removeEventListener('touchend', handleReleaseChance);
-  //     mobileChanceButton.removeEventListener('mouseup', handleReleaseChance);
-  //   };
-  // }, [changeChance, handleReleaseChance, isMobile]);
+    return () => {
+      mobileChanceButton.removeEventListener('touchstart', changeChance);
+      mobileChanceButton.removeEventListener('mousedown', changeChance);
+      mobileChanceButton.removeEventListener('touchend', handleReleaseChance);
+      mobileChanceButton.removeEventListener('mouseup', handleReleaseChance);
+    };
+  }, [changeChance, handleReleaseChance, isMobile]);
 
   return (
     <div className={`${styles[isMobile ? 'button-mobile' : 'button']} relative w-full items-center`}>
@@ -272,12 +272,6 @@ function GoButton({
             />
             <div className={`${styles['btn-mobile']} ${styles['button__icon']} cursor-custom `}>
               <div
-                style={{
-                  backgroundImage: `url(${
-                    require(`assets/images/btn/${chanceBtnPress ? 'bg-dice-press-m' : 'bg-dice-default-m'}.png`).default
-                      .src
-                  })`,
-                }}
                 ref={mobileChanceButtonRef}
                 className={`relative ${styles['get-chance-mobile']} ${chanceBtnPressM ? 'top-[5px]' : ''}`}>
                 {chanceBtnPressM && <div className={styles['dice-content-mobile-mask']}></div>}
@@ -289,29 +283,13 @@ function GoButton({
               </div>
               <div
                 ref={mobileGoButtonRef}
-                style={{
-                  backgroundImage: `url(${
-                    require(`assets/images/btn/${
-                      mBtnPress ? 'bg-go-press-m' : status === Status.DISABLED ? 'bg-go-disabled-m' : 'bg-go-default-m'
-                    }.png`).default.src
-                  })`,
-                }}
                 className={`${mBtnPress ? 'top-[4px]' : ''} ${
                   status === Status.LOADING ? 'top-[12px] left-[64px]' : 'left-[0]'
                 }  ${styles['hop-mobile']}`}>
                 {mBtnPress && status === Status.NONE && <div className={styles['btn-mobile-mask']}></div>}
                 {statusCom[status]}
               </div>
-              <div
-                style={{
-                  backgroundImage: `url(${
-                    require(`assets/images/btn/${
-                      curDiceCount === curPressM ? 'bg-dice-press-m' : 'bg-dice-default-m'
-                    }.png`).default.src
-                  })`,
-                }}
-                className={`relative ${styles['dice-number-mobile']}`}
-                ref={mobileDiceButtonRef}>
+              <div className={`relative ${styles['dice-number-mobile']}`} ref={mobileDiceButtonRef}>
                 {curPressM && <div className={styles['dice-content-mobile-mask']}></div>}
 
                 <img
