@@ -371,4 +371,4 @@ function GoButton({
   );
 }
 
-export default React.memo(GoButton);
+export default GoButton;
