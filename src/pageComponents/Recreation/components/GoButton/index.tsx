@@ -265,12 +265,12 @@ function GoButton({
         )}
         {isMobile ? (
           <div className={`${styles['button__border']} flex justify-center`}>
-            <img
+            {/* <img
               className="absolute left-0 right-0 bottom-0 top-0"
               src={require('assets/images/goButton/go-btn-border.png').default.src}
               alt="border"
-            />
-            <div className={`${styles['btn-mobile']} cursor-custom `}>
+            /> */}
+            <div className={`${styles['btn-mobile']}`}>
               <div className="text-[48px]">hi!</div>
               {/* <div
                 ref={mobileChanceButtonRef}
