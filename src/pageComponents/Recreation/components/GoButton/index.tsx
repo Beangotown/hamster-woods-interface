@@ -42,7 +42,6 @@ function GoButton({
   const { isMobile } = useGetState();
 
   const diceCount = [1, 2, 3];
-  const [, resetOverlayCount] = useState(0);
   const [curPress, setCurPress] = useState<number | null>(null);
   const [curTouch, setCurTouch] = useState<number | null>(null);
 
@@ -164,59 +163,55 @@ function GoButton({
   }, []);
 
   // Handle both touch and mouse events to support interaction in Telegram WebApp on PC
-  useEffect(() => {
-    const mobileGoButton = mobileGoButtonRef.current;
-    if (!mobileGoButton) return;
-    mobileGoButton.addEventListener('mousedown', handlePressGoButton);
-    mobileGoButton.addEventListener('mouseup', handleReleaseGoButton);
-    mobileGoButton.addEventListener('touchstart', handlePressGoButton, { passive: false });
-    mobileGoButton.addEventListener('touchend', handleReleaseGoButton);
+  // useEffect(() => {
+  //   const mobileGoButton = mobileGoButtonRef.current;
+  //   if (!mobileGoButton) return;
+  //   mobileGoButton.addEventListener('mousedown', handlePressGoButton);
+  //   mobileGoButton.addEventListener('mouseup', handleReleaseGoButton);
+  //   mobileGoButton.addEventListener('touchstart', handlePressGoButton, { passive: false });
+  //   mobileGoButton.addEventListener('touchend', handleReleaseGoButton);
 
-    return () => {
-      mobileGoButton.removeEventListener('touchstart', handlePressGoButton);
-      mobileGoButton.removeEventListener('mousedown', handlePressGoButton);
-      mobileGoButton.removeEventListener('touchend', handleReleaseGoButton);
-      mobileGoButton.removeEventListener('mouseup', handleReleaseGoButton);
-    };
-  }, [handlePressGoButton, handleReleaseGoButton, isMobile]);
+  //   return () => {
+  //     mobileGoButton.removeEventListener('touchstart', handlePressGoButton);
+  //     mobileGoButton.removeEventListener('mousedown', handlePressGoButton);
+  //     mobileGoButton.removeEventListener('touchend', handleReleaseGoButton);
+  //     mobileGoButton.removeEventListener('mouseup', handleReleaseGoButton);
+  //   };
+  // }, [handlePressGoButton, handleReleaseGoButton, isMobile]);
 
-  // Handle both touch and mouse events to support interaction in Telegram WebApp on PC
-  useEffect(() => {
-    const mobileDiceButton = mobileDiceButtonRef.current;
-    if (!mobileDiceButton) return;
-    mobileDiceButton.addEventListener('mousedown', changeDiceCount);
-    mobileDiceButton.addEventListener('mouseup', handleReleaseDice);
-    mobileDiceButton.addEventListener('touchstart', changeDiceCount, { passive: false });
-    mobileDiceButton.addEventListener('touchend', handleReleaseDice);
+  // // Handle both touch and mouse events to support interaction in Telegram WebApp on PC
+  // useEffect(() => {
+  //   const mobileDiceButton = mobileDiceButtonRef.current;
+  //   if (!mobileDiceButton) return;
+  //   mobileDiceButton.addEventListener('mousedown', changeDiceCount);
+  //   mobileDiceButton.addEventListener('mouseup', handleReleaseDice);
+  //   mobileDiceButton.addEventListener('touchstart', changeDiceCount, { passive: false });
+  //   mobileDiceButton.addEventListener('touchend', handleReleaseDice);
 
-    return () => {
-      mobileDiceButton.removeEventListener('touchstart', changeDiceCount);
-      mobileDiceButton.removeEventListener('mousedown', changeDiceCount);
-      mobileDiceButton.removeEventListener('touchend', handleReleaseDice);
-      mobileDiceButton.removeEventListener('mouseup', handleReleaseDice);
-    };
-  }, [changeDiceCount, handleReleaseDice, isMobile]);
+  //   return () => {
+  //     mobileDiceButton.removeEventListener('touchstart', changeDiceCount);
+  //     mobileDiceButton.removeEventListener('mousedown', changeDiceCount);
+  //     mobileDiceButton.removeEventListener('touchend', handleReleaseDice);
+  //     mobileDiceButton.removeEventListener('mouseup', handleReleaseDice);
+  //   };
+  // }, [changeDiceCount, handleReleaseDice, isMobile]);
 
-  // Handle both touch and mouse events to support interaction in Telegram WebApp on PC
-  useEffect(() => {
-    const mobileChanceButton = mobileChanceButtonRef.current;
-    if (!mobileChanceButton) return;
-    mobileChanceButton.addEventListener('mousedown', changeChance);
-    mobileChanceButton.addEventListener('mouseup', handleReleaseChance);
-    mobileChanceButton.addEventListener('touchstart', changeChance, { passive: false });
-    mobileChanceButton.addEventListener('touchend', handleReleaseChance);
+  // // Handle both touch and mouse events to support interaction in Telegram WebApp on PC
+  // useEffect(() => {
+  //   const mobileChanceButton = mobileChanceButtonRef.current;
+  //   if (!mobileChanceButton) return;
+  //   mobileChanceButton.addEventListener('mousedown', changeChance);
+  //   mobileChanceButton.addEventListener('mouseup', handleReleaseChance);
+  //   mobileChanceButton.addEventListener('touchstart', changeChance, { passive: false });
+  //   mobileChanceButton.addEventListener('touchend', handleReleaseChance);
 
-    return () => {
-      mobileChanceButton.removeEventListener('touchstart', changeChance);
-      mobileChanceButton.removeEventListener('mousedown', changeChance);
-      mobileChanceButton.removeEventListener('touchend', handleReleaseChance);
-      mobileChanceButton.removeEventListener('mouseup', handleReleaseChance);
-    };
-  }, [changeChance, handleReleaseChance, isMobile]);
-
-  useLayoutEffect(() => {
-    resetOverlayCount((pre) => pre + 1);
-  }, []);
+  //   return () => {
+  //     mobileChanceButton.removeEventListener('touchstart', changeChance);
+  //     mobileChanceButton.removeEventListener('mousedown', changeChance);
+  //     mobileChanceButton.removeEventListener('touchend', handleReleaseChance);
+  //     mobileChanceButton.removeEventListener('mouseup', handleReleaseChance);
+  //   };
+  // }, [changeChance, handleReleaseChance, isMobile]);
 
   return (
     <div className={`${styles[isMobile ? 'button-mobile' : 'button']} relative w-full items-center`}>
