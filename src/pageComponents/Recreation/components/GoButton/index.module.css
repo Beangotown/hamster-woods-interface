@@ -1,5 +1,5 @@
 .button-mobile {
-  @apply mt-0 h-[106px];
+  @apply mt-0 mb-[100px] h-[106px];
 
   .button__border {
     @apply w-full h-[106px] bg-[100%_100%] bg-no-repeat;
