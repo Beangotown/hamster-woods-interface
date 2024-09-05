@@ -30,6 +30,12 @@ export const FluxPointsTabContent = ({ pointsList }: FluxPointsTabContentProps) 
             } w-50 text-[#AE694C] font-roboto font-normal leading-4 break-words`}>
             Point
           </div>
+          <div
+            className={`${
+              isMobile ? 'text-[12px]' : 'text-[16px]'
+            } w-50 text-[#AE694C] font-roboto font-normal leading-4 break-words`}>
+            Mining Rewards
+          </div>
         </div>
       </div>
       {/* item  */}
