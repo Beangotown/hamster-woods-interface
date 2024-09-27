@@ -12,6 +12,7 @@ interface Window {
   NightElf?: {};
   Portkey?: any;
   open?: Function;
+  Telegram?: any;
 }
 
 interface HTMLAttributes<T> {
