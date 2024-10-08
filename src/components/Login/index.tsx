@@ -531,7 +531,7 @@ export default function Login() {
           });
           setLoading(false);
           console.log(result);
-          if (result?.zkLoginInfo && (!result?.signature || !result?.verificationDoc)) {
+          if (!result?.zkLoginInfo && (!result?.signature || !result?.verificationDoc)) {
             throw 'Verify social login error';
           }
           onStep2OfSignUpFinish(
