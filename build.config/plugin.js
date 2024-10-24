@@ -4,5 +4,8 @@ const sentryWebpackPluginOptions = {
   include: '.next',
   configFile: '.sentryclirc',
   urlPrefix: '~/_next',
+  hideSourceMaps: true,
+  disableLogger: true,
+  autoInstrumentMiddleware: false,
 };
 module.exports = [(nextConfig) => withSentryConfig(nextConfig, sentryWebpackPluginOptions)];

@@ -25,4 +25,8 @@ module.exports = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  experimental: {
+    forceSwcTransforms: false,
+    optimizePackageImports: ['lodash', 'react-use'],
+  },
 };
