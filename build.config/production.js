@@ -8,12 +8,7 @@ module.exports = {
     },
   },
   experimental: {
-    'react-use': {
-      transform: 'react-use/lib/{{member}}',
-    },
-    lodash: {
-      transform: 'lodash/{{member}}',
-    },
+    ...(commonConfig?.experimental ?? {}),
   },
   resolve: {},
 };
