@@ -7,13 +7,14 @@ WORKDIR ${web}
 COPY . ${web}
 
 ARG ENVIRONMENT
-RUN yarn && \ 
-    if [ "$ENVIRONMENT" = "mainnet" ]; \
+RUN yarn
+RUN if [ "$ENVIRONMENT" = "mainnet" ]; \
     then yarn build;\ 
     elif [ "$ENVIRONMENT" = "testnet" ]; \
     then yarn build-test; \
     fi
+RUN rm -rf .next/cache
 
-ENTRYPOINT yarn start
+ENTRYPOINT ["yarn", "start"]
 
 EXPOSE 3000

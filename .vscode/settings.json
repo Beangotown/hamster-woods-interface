@@ -5,5 +5,10 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "tailwindCSS.emmetCompletions": true,
   "emmet.triggerExpansionOnTab": true,
-  "cSpell.words": ["simsun"]
+  "cSpell.words": [
+    "simsun"
+  ],
+  "[dockerfile]": {
+    "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+  }
 }
