@@ -46,3 +46,4 @@ yarn-error.log*
 out
 storybook-static
 certificates
+analyze

@@ -1,4 +1,5 @@
 const rewritesConfig = require('./rewrites/index');
+
 module.exports = {
   reactStrictMode: true,
   async rewrites() {
@@ -14,7 +15,7 @@ module.exports = {
     ],
   },
   productionBrowserSourceMaps: true,
-  webpack: (config, { webpack }) => {
+  webpack: (config) => {
     config.module.rules.push({
       test: /\.svg$/,
       use: ['@svgr/webpack'],
@@ -27,6 +28,7 @@ module.exports = {
   },
   experimental: {
     forceSwcTransforms: false,
+    // TODO - doesn't seem to work?
     optimizePackageImports: ['lodash', 'react-use'],
   },
 };

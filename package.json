@@ -11,7 +11,7 @@
     "build": "NEXT_PUBLIC_APP_ENV=production next build",
     "build-dev": "NEXT_PUBLIC_APP_ENV=development next build",
     "build-test": "NEXT_PUBLIC_APP_ENV=test next build",
-    "build:analyze": "ANALYZE=true next build",
+    "build-analyze": "ANALYZE=true NEXT_PUBLIC_APP_ENV=production next build",
     "start": "next start",
     "lint": "next lint",
     "prepare": "husky install",
