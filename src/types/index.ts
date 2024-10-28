@@ -378,3 +378,10 @@ export type TPointPurchaseInfo = {
   isComplete: boolean;
   imageUrl: string;
 };
+
+declare module 'axios' {
+  export interface AxiosRequestConfig {
+    isCacheable?: boolean;
+    isFinished?: boolean;
+  }
+}

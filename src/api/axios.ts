@@ -11,6 +11,52 @@ interface ResponseType<T> {
   data: T;
 }
 
+type Config = {
+  uniqueUrl?: string;
+};
+const pendings: Config = {};
+const caches: Config = {};
+const cacheUtils = {
+  getUniqueUrl: (config: AxiosRequestConfig) => {
+    // you can set the rule based on your own requirement
+    return config.url + '&' + config.method;
+  },
+  isCached: function (config: AxiosRequestConfig) {
+    const uniqueUrl = this.getUniqueUrl(config) as keyof Config;
+    return caches[uniqueUrl] !== undefined;
+  },
+  isPending: function (config: AxiosRequestConfig) {
+    const uniqueUrl = this.getUniqueUrl(config);
+    if (!pendings[uniqueUrl]) {
+      pendings[uniqueUrl] = [config];
+      return false;
+    } else {
+      console.log(`cache url: ${uniqueUrl}`);
+      pendings[uniqueUrl].push(config);
+      return true;
+    }
+  },
+  setCachedResponse: function (config: AxiosRequestConfig, response: AxiosResponse) {
+    const uniqueUrl = this.getUniqueUrl(config);
+    caches[uniqueUrl] = response;
+    if (pendings[uniqueUrl]) {
+      pendings[uniqueUrl].forEach((configItem) => {
+        configItem.isFinished = true;
+      });
+    }
+  },
+  getError: function (config) {
+    const skipXHRError = new Error('skip');
+    skipXHRError.isSkipXHR = true;
+    skipXHRError.requestConfig = config;
+    return skipXHRError;
+  },
+  getCachedResponse: function (config) {
+    const uniqueUrl = this.getUniqueUrl(config);
+    return caches[uniqueUrl];
+  },
+};
+
 class Request {
   instance: AxiosInstance;
   baseConfig: AxiosRequestConfig = { baseURL: '/api', timeout: 60000 };
@@ -18,11 +64,19 @@ class Request {
   constructor(config: AxiosRequestConfig) {
     this.instance = axios.create(Object.assign({}, this.baseConfig, config));
 
-    this.instance.interceptors.request.use(
-      (config: AxiosRequestConfig) => {
-        return config;
+    // This should be the *first* response interceptor to add
+    this.instance.interceptors.response.use(
+      function (response) {
+        cacheUtils.setCachedResponse(response.config, response);
+        return response;
       },
-      (error) => {
+      function (error) {
+        /* recover from error back to normality
+         * but this time we use an cached response result
+         **/
+        if (error.isSkipXHR) {
+          return cacheUtils.getCachedResponse(error.request);
+        }
         console.error(`something were wrong when fetch ${config?.url}`, error);
         return Promise.reject(error);
       },
@@ -30,6 +84,25 @@ class Request {
 
     this.instance.interceptors.response.use(
       <T>(response: AxiosResponse<ResponseType<T>>) => {
+        const config = response.config;
+        // need to opt-in with .isCacheable
+        if (config.isCacheable) {
+          if (cacheUtils.isCached(config)) {
+            const error = cacheUtils.getError(config);
+            throw error;
+          }
+          if (cacheUtils.isPending(config)) {
+            return new Promise((resolve, reject) => {
+              const interval = setInterval(() => {
+                if (config.isFinished) {
+                  clearInterval(interval);
+                  const error = cacheUtils.getError(config);
+                  reject(error);
+                }
+              }, 200);
+            });
+          }
+        }
         const res = response.data;
         const { code, data, message: errorMessage } = response.data;
         if (config.baseURL?.includes('cms')) {
@@ -67,6 +140,9 @@ class Request {
         }
       },
       (error) => {
+        if (error.isSkipXHR) {
+          return cacheUtils.getCachedResponse(error.request);
+        }
         let errMessage = '';
         switch (error?.response?.status) {
           case 400:
@@ -138,5 +214,7 @@ const cmsRequest = new Request({ baseURL: cmsUrl });
 //   baseURL: '/connect',
 // });
 
-export default new Request({});
+const req = new Request({});
+export default req;
+
 export { cmsRequest };

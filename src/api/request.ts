@@ -1,27 +1,4 @@
 import {
-  IBeanPassClaimRes,
-  IBeanPassClaimReq,
-  IConfigResponse,
-  IChessboardDataResponse,
-  IGetRankQuery,
-  IRankHistoryQuery,
-  INoticeModalResponse,
-  IBeanPassListItem,
-  ISetCurBeanBody,
-  IErrorResponse,
-  IServerConfig,
-  IPrice,
-  IBalance,
-  IClaimAwardBody,
-  ILockInfoQuery,
-  TLockInfosResponse,
-  TUnlockInfo,
-  IBeanPassClaimReqEx,
-  TPointInfo,
-  TPointPurchaseInfo,
-} from 'types';
-import request, { cmsRequest } from './axios';
-import {
   IClaimableInfoResult,
   IRankingHistoryResult,
   IRankingSeasonListResult,
@@ -29,6 +6,29 @@ import {
   IWeeklyRankResult,
   TPastRecordResult,
 } from 'components/Leaderboard/data/types';
+import {
+  IBalance,
+  IBeanPassClaimReq,
+  IBeanPassClaimReqEx,
+  IBeanPassClaimRes,
+  IBeanPassListItem,
+  IChessboardDataResponse,
+  IClaimAwardBody,
+  IConfigResponse,
+  IErrorResponse,
+  IGetRankQuery,
+  ILockInfoQuery,
+  INoticeModalResponse,
+  IPrice,
+  IRankHistoryQuery,
+  IServerConfig,
+  ISetCurBeanBody,
+  TLockInfosResponse,
+  TPointInfo,
+  TPointPurchaseInfo,
+  TUnlockInfo,
+} from 'types';
+import request, { cmsRequest } from './axios';
 
 export const getHamsterPassClaimClaimable = async (
   query: IBeanPassClaimReq,
@@ -73,7 +73,7 @@ export const getPopup = async (params: { caAddress: string }): Promise<boolean> 
 };
 
 export const fetchConfigItems = async (): Promise<IConfigResponse> => {
-  return cmsRequest.get<IConfigResponse>('items/config');
+  return cmsRequest.get<IConfigResponse>('items/config', { isCacheable: true });
 };
 
 export const fetchChessboardData = async (url?: string): Promise<IChessboardDataResponse> => {
@@ -100,7 +100,7 @@ export const trackUnlockInfo = async (body: { caAddress: string; caHash: string 
 };
 
 export const fetchServerConfig = async (): Promise<{ data: IServerConfig }> => {
-  return request.get('app/hamster-pass/config');
+  return request.get('app/hamster-pass/config', { isCacheable: true });
 };
 
 export const fetchPrice = async (): Promise<IPrice> => {
