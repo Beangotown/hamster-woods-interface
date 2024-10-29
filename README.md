@@ -212,3 +212,8 @@ const firebaseConfig = {
 };
 ```
 
+### Lighthouse
+
+- Install locally with `npm i -g @lhci/cli`
+- Run lighthouse with `lhci collect`
+- See the results with `npx serve .lighthouseci`
