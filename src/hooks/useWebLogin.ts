@@ -1,21 +1,7 @@
 'use client';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { isMobileDevices } from 'utils/isMobile';
-import { LOGIN_EARGLY_KEY } from 'constants/platform';
-import { IPortkeyProvider } from '@portkey/provider-types';
+import { ETransferConfig, WalletTypeEnum } from '@etransfer/ui-react';
+import { getContractBasic } from '@portkey/contracts';
 import detectProvider from '@portkey/detect-provider';
-import {
-  selectInfo,
-  setGameSetting,
-  setIsNeedSyncAccountInfo,
-  setLoginStatus,
-  setPlayerInfo,
-  setWalletInfo,
-  setWalletType,
-} from 'redux/reducer/info';
-import { LoginStatus } from 'redux/types/reducerTypes';
-import { store, useSelector } from 'redux/store';
-import { AccountsType, IDiscoverInfo, SocialLoginType, WalletType, PortkeyInfoType, WalletInfoType } from 'types';
 import {
   ConfigProvider,
   DIDWalletInfo,
@@ -25,27 +11,39 @@ import {
   managerApprove,
   socialLoginAuth,
 } from '@portkey/did-ui-react';
-import isPortkeyApp from 'utils/inPortkeyApp';
-import openPageInDiscover from 'utils/openDiscoverPage';
-import getAccountInfoSync from 'utils/getAccountInfoSync';
-import ContractRequest from 'contract/contractRequest';
-import { GetGameLimitSettings, GetPlayerInformation } from 'contract/bingo';
-import useGetState from 'redux/state/useGetState';
-import DetectProvider from 'utils/InstanceProvider';
-import InstanceProvider from 'utils/InstanceProvider';
-import showMessage from 'utils/setGlobalComponentsInfo';
-import { ChainId } from '@portkey/provider-types';
-import { useRouter } from 'next/navigation';
-import { NetworkType } from 'constants/index';
-import { sleep } from 'utils/common';
-import { getSyncHolder, trackLoginInfo } from 'utils/trackAddressInfo';
-import discoverUtils from 'utils/discoverUtils';
-import { aelf } from '@portkey/utils';
-import { getContractBasic } from '@portkey/contracts';
+import { ChainId, IPortkeyProvider } from '@portkey/provider-types';
 import { TTokenApproveHandler } from '@portkey/trader-core';
-import { ETransferConfig, WalletTypeEnum } from '@etransfer/ui-react';
+import { aelf } from '@portkey/utils';
+import { NetworkType } from 'constants/index';
+import { LOGIN_EARGLY_KEY } from 'constants/platform';
+import { GetGameLimitSettings, GetPlayerInformation } from 'contract/bingo';
+import ContractRequest from 'contract/contractRequest';
+import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  selectInfo,
+  setGameSetting,
+  setIsNeedSyncAccountInfo,
+  setLoginStatus,
+  setPlayerInfo,
+  setWalletInfo,
+  setWalletType,
+} from 'redux/reducer/info';
+import useGetState from 'redux/state/useGetState';
+import { store, useSelector } from 'redux/store';
+import { LoginStatus } from 'redux/types/reducerTypes';
+import { AccountsType, IDiscoverInfo, PortkeyInfoType, SocialLoginType, WalletInfoType, WalletType } from 'types';
+import { sleep } from 'utils/common';
+import discoverUtils from 'utils/discoverUtils';
+import getAccountInfoSync from 'utils/getAccountInfoSync';
+import isPortkeyApp from 'utils/inPortkeyApp';
+import { default as DetectProvider, default as InstanceProvider } from 'utils/InstanceProvider';
+import { isMobileDevices } from 'utils/isMobile';
+import openPageInDiscover from 'utils/openDiscoverPage';
+import showMessage from 'utils/setGlobalComponentsInfo';
+import { StorageUtils } from 'utils/storage.utils';
+import { getSyncHolder, trackLoginInfo } from 'utils/trackAddressInfo';
 import { isLoginOnChain } from 'utils/wallet';
-import { STORAGE_KEYS, StorageUtils } from 'utils/storage.utils';
 
 export type DiscoverDetectState = 'unknown' | 'detected' | 'not-detected';
 
@@ -136,7 +134,9 @@ export default function useWebLogin({ signHandle }: { signHandle?: any }) {
           if (holder && filteredHolders && filteredHolders.length) {
             syncAddress.current = true;
           } else {
-            await sleep(5000);
+            // previously set at 5000ms, which may take too long to re-sync
+            // so trying with variable 1000-1500ms to avoid fixed intervals
+            await sleep(Math.random() * 1000 + 500);
           }
         }
       } catch (err) {

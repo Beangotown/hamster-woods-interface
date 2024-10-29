@@ -1,79 +1,83 @@
 'use client';
 import {
-  useSignHandler,
+  AddManagerType,
+  ConfigProvider,
+  CreatePendingInfo,
+  did,
   DIDWalletInfo,
+  errorTip,
+  getOperationDetails,
+  GuardianApprovalModal,
+  handleErrorMessage,
   IGuardianIdentifierInfo,
+  LifeCycleType,
+  NetworkType,
+  setLoading,
+  SignIn,
+  TelegramPlatform,
+  TOnSuccessExtraData,
   TStep1LifeCycle,
   TStep2SignInLifeCycle,
-  SignIn,
-  did,
-  Unlock,
-  TStep3LifeCycle,
   TStep2SignUpLifeCycle,
-  handleErrorMessage,
-  errorTip,
-  setLoading,
-  TelegramPlatform,
+  TStep3LifeCycle,
+  Unlock,
   useLoginWallet,
-  AddManagerType,
-  useSignInHandler,
-  CreatePendingInfo,
-  TOnSuccessExtraData,
-  ConfigProvider,
-  LifeCycleType,
-  GuardianApprovalModal,
-  NetworkType,
   useMultiVerify,
-  getOperationDetails,
   UserGuardianStatus,
+  useSignHandler,
+  useSignInHandler,
 } from '@portkey/did-ui-react';
+import { AccountType, GuardiansApproved } from '@portkey/services';
+import { ChainId } from '@portkey/types';
 import { Drawer, Modal } from 'antd';
-import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import {
-  setLoginStatus,
+  AppleIcon,
+  CloseIcon,
+  EmailIcon,
+  GoogleIcon,
+  PhoneIcon,
+  PortkeyIcon,
+  QrCodeIcon,
+  TelegramIcon,
+} from 'assets/images/index';
+import CommonBtn from 'components/CommonBtn';
+import ShowPageLoading from 'components/ShowPageLoading';
+import { WalletType } from 'constants/index';
+import { DEFAULT_PIN } from 'constants/login';
+import {
+  KEY_NAME,
+  LOGIN_EARGLY_KEY,
+  PORTKEY_LOGIN_CHAIN_ID_KEY,
+  PORTKEY_LOGIN_SESSION_ID_KEY,
+} from 'constants/platform';
+import ContractRequest from 'contract/contractRequest';
+import useVerifier from 'hooks/useVarified';
+import useWebLogin from 'hooks/useWebLogin';
+import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { setChessboardResetStart, setChessboardTotalStep, setCurChessboardNode } from 'redux/reducer/chessboardData';
+import {
   setIsNeedSyncAccountInfo,
+  setLoginStatus,
   setPlayerInfo,
   setWalletInfo,
   setWalletType,
 } from 'redux/reducer/info';
-import { setChessboardResetStart, setChessboardTotalStep, setCurChessboardNode } from 'redux/reducer/chessboardData';
-import { LoginStatus } from 'redux/types/reducerTypes';
-import isMobile, { isMobileDevices } from 'utils/isMobile';
-import isPortkeyApp from 'utils/inPortkeyApp';
-import { LOGIN_EARGLY_KEY, PORTKEY_LOGIN_CHAIN_ID_KEY, PORTKEY_LOGIN_SESSION_ID_KEY } from 'constants/platform';
-import { SignInDesignType, SocialLoginType, OperationTypeEnum, TSignUpVerifier } from 'types/index';
-import styles from './style.module.css';
-import { useRouter } from 'next/navigation';
-import { sleep } from 'utils/common';
-import useVerifier from 'hooks/useVarified';
-import { WalletType } from 'constants/index';
-import {
-  PortkeyIcon,
-  AppleIcon,
-  QrCodeIcon,
-  PhoneIcon,
-  EmailIcon,
-  GoogleIcon,
-  TelegramIcon,
-} from 'assets/images/index';
-import { CloseIcon } from 'assets/images/index';
-import useWebLogin from 'hooks/useWebLogin';
-import { KEY_NAME } from 'constants/platform';
-import { DEFAULT_PIN } from 'constants/login';
 import useGetState from 'redux/state/useGetState';
-import { ChainId } from '@portkey/types';
-import showMessage from 'utils/setGlobalComponentsInfo';
-import { Proto } from 'utils/proto';
+import { store } from 'redux/store';
+import { LoginStatus } from 'redux/types/reducerTypes';
+import { OperationTypeEnum, SignInDesignType, SocialLoginType, TSignUpVerifier } from 'types/index';
+import { sleep } from 'utils/common';
 import { getProto } from 'utils/deserializeLog';
 import discoverUtils from 'utils/discoverUtils';
-import CommonBtn from 'components/CommonBtn';
-import ShowPageLoading from 'components/ShowPageLoading';
-import { isLoginOnChain } from 'utils/wallet';
-import { store } from 'redux/store';
 import { handleSDKLogoutOffChain } from 'utils/handleLogout';
-import ContractRequest from 'contract/contractRequest';
+import isPortkeyApp from 'utils/inPortkeyApp';
+import isMobile, { isMobileDevices } from 'utils/isMobile';
+import { Proto } from 'utils/proto';
+import showMessage from 'utils/setGlobalComponentsInfo';
 import { StorageUtils } from 'utils/storage.utils';
-import { AccountType, GuardiansApproved } from '@portkey/services';
+import { isLoginOnChain } from 'utils/wallet';
+import styles from './style.module.css';
 
 const components = {
   phone: PhoneIcon,
@@ -321,7 +325,7 @@ export default function Login() {
 
   const isInApp = isPortkeyApp();
 
-  const [_isWalletExist, setIsWalletExist] = useState(false);
+  // const [_isWalletExist, setIsWalletExist] = useState(false);
 
   useEffect(() => {
     if (typeof window !== undefined) {
@@ -344,7 +348,7 @@ export default function Login() {
       if (window.localStorage.getItem(StorageUtils.getWalletKey())) {
         console.log('wfs setLoginStatus=>4');
         setLoginStatus(LoginStatus.LOCK);
-        setIsWalletExist(true);
+        // setIsWalletExist(true);
       } else if (isTelegramPlatform) {
         // Automatically obtain Telegram authorization
         isGettingTelegramAuthRef.current = true;
@@ -569,7 +573,6 @@ export default function Login() {
   );
 
   useEffect(() => {
-    console.log(isLock, 'isLock=====111');
     if (isTelegramPlatform && isLock) {
       unlock(DEFAULT_PIN);
     }

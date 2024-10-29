@@ -1,30 +1,29 @@
 'use client';
-import React, { useEffect, useState } from 'react';
-import Header from 'components/Header';
 import { Layout as AntdLayout } from 'antd';
+import Header from 'components/Header';
+import React, { useEffect, useState } from 'react';
 
 // import 'utils/firebase';
 
 import dynamic from 'next/dynamic';
 
-import { store } from 'redux/store';
+import { ConfigProvider, TelegramPlatform, did } from '@portkey/did-ui-react';
 import { setIsMobile, setLoginStatus } from 'redux/reducer/info';
+import { store } from 'redux/store';
 import isMobile from 'utils/isMobile';
 import { Store } from 'utils/store';
-import { ConfigProvider, TelegramPlatform, did } from '@portkey/did-ui-react';
 
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
-import useGetState from 'redux/state/useGetState';
-import { TELEGRAM_BOT_ID } from 'constants/platform';
-import { LoginStatus } from 'redux/types/reducerTypes';
 import { fetchConfigItems, fetchServerConfig } from 'api/request';
-import { setConfigInfo } from 'redux/reducer/configInfo';
-import { convertToUtcTimestamp } from 'hooks/useCountDown';
-import { setServerConfigInfo } from 'redux/reducer/serverConfigInfo';
 import { HAMSTER_PROJECT_CODE } from 'constants/login';
+import { TELEGRAM_BOT_ID } from 'constants/platform';
+import { convertToUtcTimestamp } from 'hooks/useCountDown';
+import { setConfigInfo } from 'redux/reducer/configInfo';
+import { setServerConfigInfo } from 'redux/reducer/serverConfigInfo';
+import useGetState from 'redux/state/useGetState';
+import { LoginStatus } from 'redux/types/reducerTypes';
 import { getCurrentIp } from 'utils/ip';
-import { sleep } from '@portkey/utils';
 import { StorageUtils } from 'utils/storage.utils';
 
 did.setConfig({
@@ -148,8 +147,6 @@ const Layout = dynamic(
               },
             },
           });
-
-          await sleep(3000);
           if (!isHandleSDKLogout) {
             isHandleSDKLogout = true;
             // TelegramPlatform.initializeTelegramWebApp({ tgUserChanged: ()=>{} });
@@ -160,9 +157,11 @@ const Layout = dynamic(
           console.log('===serverConfig', res);
           store.dispatch(setServerConfigInfo(res));
         });
-
-        Promise.all([configPromise, serverConfigPromise]).then((res) => {
+        const _timerLabel = 'timer--' + Math.random() + ' ' + Math.random();
+        console.time(_timerLabel);
+        Promise.all([configPromise, serverConfigPromise]).then(() => {
           setIsFetchFinished(true);
+          console.timeEnd(_timerLabel);
         });
       };
 
@@ -222,4 +221,4 @@ const Layout = dynamic(
   { ssr: false },
 );
 
-export default React.memo(Layout);
+export default Layout;
