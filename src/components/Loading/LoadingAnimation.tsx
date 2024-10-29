@@ -1,8 +1,8 @@
-import { useLottie } from 'lottie-react';
-import LoadingAnimationJson from 'assets/images/loading-animation.json';
-import useGetState from 'redux/state/useGetState';
 import { TelegramPlatform } from '@portkey/did-ui-react';
 import GameComing from 'assets/images/game-coming.png';
+import LoadingAnimationJson from 'assets/images/loading-animation.json';
+import { useLottie } from 'lottie-react';
+import useGetState from 'redux/state/useGetState';
 
 export default function LoadingAnimation() {
   const { isMobile } = useGetState();
@@ -32,12 +32,12 @@ export default function LoadingAnimation() {
       {isMobile ? null : (
         <img
           src={require('assets/images/bg/hamster-logo.png').default.src}
-          width={isMobile ? 'w-[240px]' : 'w-[480px]'}
+          width={isMobile ? 240 : 480}
           alt="logo"
           className={`mx-auto ${isMobile ? 'h-[240px] w-[240px]' : 'h-[480px] w-[480px]'}`}></img>
       )}
       <img
-        width={isMobile ? 'w-[285px]' : 'w-[480px]'}
+        width={isMobile ? 285 : 480}
         src={GameComing.src}
         alt="coming"
         className={`mx-auto ${isMobile ? 'w-[285px]' : 'w-[480px]'}`}></img>

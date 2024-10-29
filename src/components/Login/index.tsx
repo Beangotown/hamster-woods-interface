@@ -91,7 +91,7 @@ const components = {
 
 type IconType = 'apple' | 'google' | 'portkey' | 'email' | 'phone' | 'qrcode' | 'telegram';
 
-const Login = () => {
+export default function Login() {
   const signInRef = useRef<{ setOpen: Function }>(null);
   const isGettingTelegramAuthRef = useRef(false);
 
@@ -883,6 +883,4 @@ const Login = () => {
       {!isTelegramPlatform && <ShowPageLoading open={showPageLoading} />}
     </div>
   );
-};
-
-export default Login;
+}
