@@ -122,7 +122,6 @@ const Layout = dynamic(
           });
         })();
       }, []);
-
       const initConfigAndResource = async () => {
         const serverConfigPromise = fetchServerConfig();
         const configPromise = fetchConfigItems();
@@ -157,11 +156,8 @@ const Layout = dynamic(
           console.log('===serverConfig', res);
           store.dispatch(setServerConfigInfo(res));
         });
-        const _timerLabel = 'timer--' + Math.random() + ' ' + Math.random();
-        console.time(_timerLabel);
         Promise.all([configPromise, serverConfigPromise]).then(() => {
           setIsFetchFinished(true);
-          console.timeEnd(_timerLabel);
         });
       };
 
