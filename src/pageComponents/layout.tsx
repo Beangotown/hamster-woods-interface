@@ -15,7 +15,7 @@ import { Store } from 'utils/store';
 
 import { usePathname, useRouter } from 'next/navigation';
 
-import { fetchConfigItems, fetchServerConfig } from 'api/request';
+import { initConfigAndResource } from 'api/request';
 import { HAMSTER_PROJECT_CODE } from 'constants/login';
 import { TELEGRAM_BOT_ID } from 'constants/platform';
 import { convertToUtcTimestamp } from 'hooks/useCountDown';
@@ -122,47 +122,41 @@ const Layout = dynamic(
           });
         })();
       }, []);
-      const initConfigAndResource = async () => {
-        const serverConfigPromise = fetchServerConfig();
-        const configPromise = fetchConfigItems();
-
-        configPromise.then(async (res) => {
-          store.dispatch(
-            setConfigInfo({
-              ...res.data,
-              isHalloween: false,
-            }),
-          );
-          ConfigProvider.setGlobalConfig({
-            storageMethod: new Store(),
-            requestDefaults: {
-              baseURL: res.data.portkeyServer,
-            },
-            serviceUrl: res.data.portkeyServiceUrl,
-            graphQLUrl: res.data.graphqlServer,
-            socialLogin: {
-              Telegram: {
-                botId: TELEGRAM_BOT_ID,
-              },
-            },
-          });
-          if (!isHandleSDKLogout) {
-            isHandleSDKLogout = true;
-            // TelegramPlatform.initializeTelegramWebApp({ tgUserChanged: ()=>{} });
-          }
-        });
-
-        serverConfigPromise.then((res) => {
-          console.log('===serverConfig', res);
-          store.dispatch(setServerConfigInfo(res));
-        });
-        Promise.all([configPromise, serverConfigPromise]).then(() => {
-          setIsFetchFinished(true);
-        });
-      };
 
       useEffect(() => {
-        initConfigAndResource();
+        initConfigAndResource(
+          async (res) => {
+            store.dispatch(
+              setConfigInfo({
+                ...res.data,
+                isHalloween: false,
+              }),
+            );
+            ConfigProvider.setGlobalConfig({
+              storageMethod: new Store(),
+              requestDefaults: {
+                baseURL: res.data.portkeyServer,
+              },
+              serviceUrl: res.data.portkeyServiceUrl,
+              graphQLUrl: res.data.graphqlServer,
+              socialLogin: {
+                Telegram: {
+                  botId: TELEGRAM_BOT_ID,
+                },
+              },
+            });
+            if (!isHandleSDKLogout) {
+              isHandleSDKLogout = true;
+              // TelegramPlatform.initializeTelegramWebApp({ tgUserChanged: ()=>{} });
+            }
+          },
+          (res) => {
+            store.dispatch(setServerConfigInfo(res));
+          },
+          () => {
+            setIsFetchFinished(true);
+          },
+        );
 
         const resize = () => {
           const ua = navigator.userAgent;

@@ -125,3 +125,17 @@ export const getDailyTask = async (query: IBeanPassClaimReq): Promise<TPointInfo
 export const getWeeklyTask = async (query: IBeanPassClaimReq): Promise<TPointPurchaseInfo[]> => {
   return request.get('/app/points/weekly', { params: query });
 };
+
+export const initConfigAndResource = async (
+  configCallback: (res: IConfigResponse) => void,
+  serverConfigCallback: (res: { data: IServerConfig }) => void,
+  finalCallback: () => void,
+) => {
+  const serverConfigPromise = fetchServerConfig();
+  const configPromise = fetchConfigItems();
+
+  configPromise.then(configCallback);
+
+  serverConfigPromise.then(serverConfigCallback);
+  Promise.all([configPromise, serverConfigPromise]).then(finalCallback);
+};
