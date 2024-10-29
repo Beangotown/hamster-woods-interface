@@ -29,6 +29,7 @@ import {
   TUnlockInfo,
 } from 'types';
 import request, { cmsRequest } from './axios';
+import type { AxiosRequestConfig } from 'axios';
 
 export const getHamsterPassClaimClaimable = async (
   query: IBeanPassClaimReq,
@@ -72,8 +73,8 @@ export const getPopup = async (params: { caAddress: string }): Promise<boolean> 
   return request.post('app/bean-pass/popup', params);
 };
 
-export const fetchConfigItems = async (): Promise<IConfigResponse> => {
-  return cmsRequest.get<IConfigResponse>('items/config', { isCacheable: true });
+export const fetchConfigItems = async (cfg: AxiosRequestConfig = {}): Promise<IConfigResponse> => {
+  return cmsRequest.get<IConfigResponse>('items/config', cfg);
 };
 
 export const fetchChessboardData = async (url?: string): Promise<IChessboardDataResponse> => {
@@ -99,8 +100,8 @@ export const trackUnlockInfo = async (body: { caAddress: string; caHash: string 
   return request.post('/app/trace/user-action', body);
 };
 
-export const fetchServerConfig = async (): Promise<{ data: IServerConfig }> => {
-  return request.get('app/hamster-pass/config', { isCacheable: true });
+export const fetchServerConfig = async (cfg: AxiosRequestConfig = {}): Promise<{ data: IServerConfig }> => {
+  return request.get('app/hamster-pass/config', cfg);
 };
 
 export const fetchPrice = async (): Promise<IPrice> => {
@@ -126,13 +127,14 @@ export const getWeeklyTask = async (query: IBeanPassClaimReq): Promise<TPointPur
   return request.get('/app/points/weekly', { params: query });
 };
 
+const noOp = () => undefined;
 export const initConfigAndResource = async (
-  configCallback: (res: IConfigResponse) => void,
-  serverConfigCallback: (res: { data: IServerConfig }) => void,
-  finalCallback: () => void,
+  configCallback: (res: IConfigResponse) => void = noOp,
+  serverConfigCallback: (res: { data: IServerConfig }) => void = noOp,
+  finalCallback: () => void = noOp,
 ) => {
-  const serverConfigPromise = fetchServerConfig();
-  const configPromise = fetchConfigItems();
+  const serverConfigPromise = fetchServerConfig({ isCacheable: true });
+  const configPromise = fetchConfigItems({ isCacheable: true });
 
   configPromise.then(configCallback);
 
