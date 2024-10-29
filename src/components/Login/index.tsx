@@ -91,7 +91,7 @@ const components = {
 
 type IconType = 'apple' | 'google' | 'portkey' | 'email' | 'phone' | 'qrcode' | 'telegram';
 
-export default function Login() {
+const Login = () => {
   const signInRef = useRef<{ setOpen: Function }>(null);
   const isGettingTelegramAuthRef = useRef(false);
 
@@ -690,15 +690,14 @@ export default function Login() {
     }
   };
 
-  const initializeProto = async () => {
-    if (configInfo?.rpcUrl && configInfo?.beanGoTownContractAddress) {
-      const protoBuf = await getProto(configInfo.beanGoTownContractAddress, configInfo.rpcUrl);
-      const proto = Proto.getInstance();
-      proto.setProto(protoBuf);
-    }
-  };
-
   useEffect(() => {
+    const initializeProto = async () => {
+      if (configInfo?.rpcUrl && configInfo?.beanGoTownContractAddress) {
+        const protoBuf = await getProto(configInfo.beanGoTownContractAddress, configInfo.rpcUrl);
+        const proto = Proto.getInstance();
+        proto.setProto(protoBuf);
+      }
+    };
     initializeProto();
   }, [configInfo?.rpcUrl, configInfo?.beanGoTownContractAddress]);
 
@@ -884,4 +883,6 @@ export default function Login() {
       {!isTelegramPlatform && <ShowPageLoading open={showPageLoading} />}
     </div>
   );
-}
+};
+
+export default Login;

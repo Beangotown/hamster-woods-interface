@@ -1,10 +1,10 @@
 'use client';
 
-import '@portkey/did-ui-react/dist/assets/index.css';
 import { NetworkType, PortkeyProvider } from '@portkey/did-ui-react';
+import '@portkey/did-ui-react/dist/assets/index.css';
 import useGetState from 'redux/state/useGetState';
 
-export default ({ children }: { children: React.ReactNode }) => {
+const WebLoginProvider = ({ children }: { children: React.ReactNode }) => {
   const { configInfo } = useGetState();
 
   if (!configInfo) {
@@ -12,3 +12,5 @@ export default ({ children }: { children: React.ReactNode }) => {
   }
   return <PortkeyProvider networkType={configInfo?.network as NetworkType}>{children}</PortkeyProvider>;
 };
+
+export default WebLoginProvider;
