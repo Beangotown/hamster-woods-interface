@@ -19,6 +19,7 @@ import { handleErrorMessage } from '@portkey/did-ui-react';
 import { useQueryAuthToken } from 'hooks/authToken';
 import Task from './components/Task';
 import LoadingModal from 'components/LoadingModal';
+import useOpenGuardianApprove from 'hooks/useOpenGuardianApprove';
 
 export default function Header() {
   const { walletType, isOnChainLogin, needSync } = useGetState();
@@ -38,6 +39,7 @@ export default function Header() {
   const tooltipRef = useRef<any>(null);
   const { getETransferAuthToken } = useQueryAuthToken();
   const [syncLoading, setSyncLoading] = useState(false);
+  const { openGuardianApprove } = useOpenGuardianApprove();
 
   useEffect(() => {
     const handleDocumentClick = (event: any) => {
@@ -57,12 +59,15 @@ export default function Header() {
       if ((!isOnChainLogin && walletType === WalletType.portkey) || needSync) {
         return setSyncLoading(true);
       }
+      if (openGuardianApprove()) {
+        return;
+      }
       await getETransferAuthToken();
       setDepositVisible(true);
     } catch (error) {
       message.error(handleErrorMessage(error, 'Get etransfer auth token error'));
     }
-  }, [getETransferAuthToken, isOnChainLogin, needSync, walletType]);
+  }, [getETransferAuthToken, isOnChainLogin, needSync, openGuardianApprove, walletType]);
 
   return (
     <div className={styles.headerContainer}>

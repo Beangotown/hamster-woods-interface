@@ -1,6 +1,7 @@
 import { getHamsterPassClaimClaimable } from 'api/request';
 import LoadingModal from 'components/LoadingModal';
 import { useAddress } from 'hooks/useAddress';
+import useOpenGuardianApprove from 'hooks/useOpenGuardianApprove';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
@@ -11,6 +12,7 @@ import showMessage from 'utils/setGlobalComponentsInfo';
 export default function Wallet() {
   const { isMobile, isOnChainLogin, walletType, needSync } = useGetState();
   const [syncLoading, setSyncLoading] = useState(false);
+  const { openGuardianApprove } = useOpenGuardianApprove();
 
   const router = useRouter();
 
@@ -19,6 +21,9 @@ export default function Wallet() {
   const checkAccountInitStatus = useCallback(async () => {
     if ((!isOnChainLogin && walletType === WalletType.portkey) || needSync) {
       return setSyncLoading(true);
+    }
+    if (openGuardianApprove()) {
+      return;
     }
     showMessage.loading();
     let checkAccountInitStatusRes;

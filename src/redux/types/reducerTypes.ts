@@ -30,6 +30,8 @@ export type InfoStateType = {
   isNeedSyncAccountInfo: boolean;
   curBeanPass?: IBeanPassListItem;
   loadingCountdown?: number;
+  isManagerReadOnly?: boolean;
+  guardianListForFirstNeed?: any[];
 };
 
 export type PageLoadingType = {

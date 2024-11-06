@@ -37,6 +37,8 @@ const useGetState = () => {
     needSync: infoState.isNeedSyncAccountInfo,
     loadingCountdown: infoState.loadingCountdown,
     curBeanPass: infoState.curBeanPass,
+    isManagerReadOnly: infoState.isManagerReadOnly,
+    guardianListForFirstNeed: infoState.guardianListForFirstNeed,
     configInfo,
     chessBoardInfo,
     imageResources,

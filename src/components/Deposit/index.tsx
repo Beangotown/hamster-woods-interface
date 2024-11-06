@@ -10,6 +10,8 @@ import { AppState } from 'redux/store';
 import { useEffect } from 'react';
 import { etransferEvents } from '@etransfer/utils';
 import { useQueryAuthToken } from 'hooks/authToken';
+import useGetState from 'redux/state/useGetState';
+import { WalletType } from 'types';
 
 export default function DepositModal(
   props: ModalProps & {
@@ -20,14 +22,17 @@ export default function DepositModal(
   const isMobile = useIsMobile();
   const { configInfo } = useSelector((state: AppState) => state.configInfo);
   const { getETransferAuthTokenFromApi } = useQueryAuthToken();
+  const { isOnChainLogin, walletType } = useGetState();
 
   useEffect(() => {
+    if (!isOnChainLogin && walletType === WalletType.portkey) {
+      return;
+    }
     const { remove } = etransferEvents.DeniedRequest.addListener(() => {
       getETransferAuthTokenFromApi();
     });
     return () => remove();
-  }),
-    [];
+  }, [getETransferAuthTokenFromApi, isOnChainLogin, walletType]);
 
   return (
     <CustomModal

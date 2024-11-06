@@ -21,6 +21,8 @@ const initialState: InfoStateType = {
   assetVisible: false,
   isNeedSyncAccountInfo: true,
   loadingCountdown: 0,
+  isManagerReadOnly: false,
+  guardianListForFirstNeed: [],
 };
 
 // Actual Slice
@@ -77,6 +79,12 @@ export const infoSlice = createSlice({
     setCurBeanPass(state, action) {
       state.curBeanPass = action.payload;
     },
+    setIsManagerReadOnly(state, action) {
+      state.isManagerReadOnly = action.payload;
+    },
+    setGuardianListForFirstNeed(state, action) {
+      state.guardianListForFirstNeed = action.payload;
+    },
   },
 
   // Special reducer for hydrating the state. Special case for next-redux-wrapper
@@ -106,6 +114,8 @@ export const {
   setIsNeedSyncAccountInfo,
   setLoadingCountdown,
   setCurBeanPass,
+  setIsManagerReadOnly,
+  setGuardianListForFirstNeed,
 } = infoSlice.actions;
 export const selectInfo = (state: AppState) => state.info;
 export default infoSlice.reducer;

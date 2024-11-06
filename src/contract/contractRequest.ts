@@ -365,6 +365,7 @@ export default class ContractRequest {
             'ManagerForwardCall',
             this.caAddress!,
             {
+              // guardiansApproved: store.getState().info.guardianListForFirstNeed,
               caHash: this.caHash,
               contractAddress: params.contractAddress,
               methodName: params.methodName,
@@ -436,10 +437,12 @@ export default class ContractRequest {
       }
       case WalletType.portkey: {
         try {
+          console.log('wfs----LoadingModal---guardianListForFirstNeed', store.getState().info.guardianListForFirstNeed);
           result = await this.caContract?.callSendMethod(
             'ManagerForwardCall',
             this.caAddress!,
             {
+              guardiansApproved: store.getState().info.guardianListForFirstNeed,
               caHash: this.caHash,
               contractAddress: params.contractAddress,
               methodName: params.methodName,
@@ -447,6 +450,7 @@ export default class ContractRequest {
             },
             { onMethod: 'transactionHash' },
           );
+          console.log('wfs----LoadingModal---result', result);
         } catch (error) {
           console.error('=====callSendMethodNoResult error portkey', error);
           this.contractCaptureMessage(params, error, MethodType.CALLSENDMETHOD);
