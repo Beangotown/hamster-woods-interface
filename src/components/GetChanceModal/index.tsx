@@ -29,6 +29,7 @@ import { useAddress } from 'hooks/useAddress';
 import useWebLogin from 'hooks/useWebLogin';
 import { useBalance } from 'hooks/useBalance';
 import LoadingModal from 'components/LoadingModal';
+import useOpenGuardianApprove from 'hooks/useOpenGuardianApprove';
 
 export type GetChanceModalPropsType = {
   onConfirm?: (n: number, chancePrice: number) => void;
@@ -64,6 +65,7 @@ export default function GetChanceModal({
   const { getETransferAuthToken } = useQueryAuthToken();
   const getBalance = useBalance();
   const [syncLoading, setSyncLoading] = useState(false);
+  const { openGuardianApprove } = useOpenGuardianApprove();
 
   const chancePrice = useMemo(
     () => serverConfigInfo.serverConfigInfo?.chancePrice || 1,
@@ -109,12 +111,15 @@ export default function GetChanceModal({
       if ((!isOnChainLogin && walletType === WalletType.portkey) || needSync) {
         return setSyncLoading(true);
       }
+      if (openGuardianApprove()) {
+        return;
+      }
       await getETransferAuthToken();
       setShowDepositModal(true);
     } catch (error) {
       message.error(handleErrorMessage(error, 'Get etransfer auth token error'));
     }
-  }, [getETransferAuthToken, isOnChainLogin, needSync, walletType]);
+  }, [getETransferAuthToken, isOnChainLogin, needSync, openGuardianApprove, walletType]);
 
   const errorMessageTipDom = useCallback(() => {
     if (!errMsgTip)
@@ -181,9 +186,22 @@ export default function GetChanceModal({
     if ((!isOnChainLogin && walletType === WalletType.portkey) || needSync) {
       return setSyncLoading(true);
     }
+    if (openGuardianApprove()) {
+      return;
+    }
     if (!handleCheckPurchase()) return;
     onConfirm?.(inputVal, chancePrice);
-  }, [chancePrice, errMsgTip, handleCheckPurchase, inputVal, isOnChainLogin, needSync, onConfirm, walletType]);
+  }, [
+    chancePrice,
+    errMsgTip,
+    handleCheckPurchase,
+    inputVal,
+    isOnChainLogin,
+    needSync,
+    onConfirm,
+    openGuardianApprove,
+    walletType,
+  ]);
 
   const handleCancel = useCallback(() => {
     setInputVal(1);
@@ -362,6 +380,9 @@ export default function GetChanceModal({
                   onClick={() => {
                     if ((!isOnChainLogin && walletType === WalletType.portkey) || needSync) {
                       return setSyncLoading(true);
+                    }
+                    if (openGuardianApprove()) {
+                      return;
                     }
                     setSwapOpen(true);
                   }}

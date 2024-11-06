@@ -28,7 +28,7 @@ import {
 import useWebLogin from 'hooks/useWebLogin';
 import showMessage from 'utils/setGlobalComponentsInfo';
 import BoardLeft from './components/BoardLeft';
-import { setCurBeanPass, setPlayerInfo } from 'redux/reducer/info';
+import { setCurBeanPass, setPlayerInfo, setIsManagerReadOnly } from 'redux/reducer/info';
 import { IBalance, IBeanPassListItem, IContractError, WalletType } from 'types';
 import ShowNFTModal from 'components/CommonModal/ShowNFTModal';
 import { dispatch, store } from 'redux/store';
@@ -58,10 +58,14 @@ import { addPrefixSuffix } from 'utils/addressFormatting';
 import { checkerboardData } from 'constants/checkerboardData';
 import DepositModal from 'components/Deposit';
 import { message } from 'antd';
-import { handleErrorMessage } from '@portkey/did-ui-react';
+import { getChainInfo, handleErrorMessage, did, TelegramPlatform } from '@portkey/did-ui-react';
 import { useQueryAuthToken } from 'hooks/authToken';
 import LoadingModal from 'components/LoadingModal';
 import { useLoadingCountdown } from 'hooks/useCountDown';
+import GuardianModal from 'components/Login/GuardianModal';
+import ContractRequest from 'contract/contractRequest';
+import { EE } from 'utils/event';
+import useOpenGuardianApprove from 'hooks/useOpenGuardianApprove';
 
 export default function Game() {
   useEffect(() => {
@@ -95,8 +99,10 @@ export default function Game() {
     needSync,
     checkerboardCounts,
     curBeanPass,
+    isManagerReadOnly,
+    guardianListForFirstNeed,
   } = useGetState();
-  console.log('wfs render Game page out', new Date(), isLogin, isOnChainLogin);
+  // console.log('wfs render Game page out', new Date(), isLogin, isOnChainLogin);
   const { getETransferAuthToken } = useQueryAuthToken();
 
   const [beanPassInfoDto, setBeanPassInfoDto] = useState<IBeanPassListItem | undefined>(curBeanPass);
@@ -163,6 +169,8 @@ export default function Game() {
     x: 0,
     y: 0,
   });
+
+  const { openGuardianApprove } = useOpenGuardianApprove();
 
   const updateStep = () => {
     store.dispatch(
@@ -326,8 +334,16 @@ export default function Game() {
   );
 
   const go = async () => {
+    console.log('wfs----LoadingModal--go', isOnChainLogin, walletType === WalletType.portkey, needSync);
     if ((!isOnChainLogin && walletType === WalletType.portkey) || needSync) {
       return setSyncLoading(true);
+    }
+    // if (isManagerReadOnly && guardianListForFirstNeed?.length === 0 && walletType === WalletType.portkey) {
+    //   EE.emit('SET_GUARDIAN_APPROVAL_MODAL', true);
+    //   return;
+    // }
+    if (openGuardianApprove()) {
+      return;
     }
     if (goStatus !== Status.NONE) {
       if (!hasNft) {
@@ -471,12 +487,15 @@ export default function Game() {
       if ((!isOnChainLogin && walletType === WalletType.portkey) || needSync) {
         return setSyncLoading(true);
       }
+      if (openGuardianApprove()) {
+        return;
+      }
       await getETransferAuthToken();
       setDepositVisible(true);
     } catch (error) {
       message.error(handleErrorMessage(error, 'Get etransfer auth token error'));
     }
-  }, [getETransferAuthToken, isOnChainLogin, needSync, walletType]);
+  }, [getETransferAuthToken, isOnChainLogin, needSync, openGuardianApprove, walletType]);
 
   const handleHasNft = useCallback(
     (hasNft: boolean) => {
@@ -524,7 +543,10 @@ export default function Game() {
     initCheckerboard();
   }, [hasNft, checkerboardData]);
 
-  useEffectOnce(() => {
+  useEffect(() => {
+    if (!isOnChainLogin && walletType === WalletType.portkey) {
+      return;
+    }
     showMessage.loading();
     getETransferAuthTokenFromApi();
     setResetStart(chessboardResetStart);
@@ -538,7 +560,7 @@ export default function Game() {
       }, 25);
     }
     showMessage.hideLoading();
-  });
+  }, [isOnChainLogin]);
 
   useEffect(() => {
     updateAssetBalance();
@@ -617,6 +639,27 @@ export default function Game() {
       }
     }
   }, [playerInfo?.hamsterPassOwned, address, handleHasNft, getHamsterPass]);
+
+  useEffect(() => {
+    if (!isOnChainLogin) {
+      return;
+    }
+    async function getIsManagerReadOnly() {
+      console.log(
+        'wfs----LoadingModal---chainInfo.caContractAddress',
+        walletInfo?.portkeyInfo?.caInfo?.caHash,
+        walletInfo?.portkeyInfo?.walletInfo?.address,
+        did.didWallet.managementAccount?.address,
+      );
+      const rs = await ContractRequest.get().caContract?.callViewMethod('IsManagerReadOnly', {
+        caHash: walletInfo?.portkeyInfo?.caInfo?.caHash,
+        manager: walletInfo?.portkeyInfo?.walletInfo?.address,
+      });
+      console.log('wfs----LoadingModal--getIsManagerReadOnly', rs);
+      store.dispatch(setIsManagerReadOnly(!!rs?.data));
+    }
+    getIsManagerReadOnly();
+  }, [isOnChainLogin, walletInfo?.portkeyInfo?.caInfo?.caHash, walletInfo?.portkeyInfo?.walletInfo?.address]);
 
   return (
     <>
@@ -772,6 +815,13 @@ export default function Game() {
       </div>
 
       <GlobalCom getChance={getChance} />
+
+      <GuardianModal
+        networkType={configInfo?.network}
+        caHash={walletInfo?.portkeyInfo?.caInfo?.caHash}
+        originChainId={walletInfo?.portkeyInfo?.chainId}
+        targetChainId={configInfo?.curChain ?? ''}
+      />
     </>
   );
 }

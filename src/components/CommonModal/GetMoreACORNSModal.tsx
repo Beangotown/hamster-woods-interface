@@ -14,6 +14,7 @@ import { handleErrorMessage } from '@portkey/did-ui-react';
 import useGetState from 'redux/state/useGetState';
 import { WalletType } from 'types';
 import LoadingModal from 'components/LoadingModal';
+import useOpenGuardianApprove from 'hooks/useOpenGuardianApprove';
 
 export default function GetMoreACORNSModal({ open, onCancel, ...props }: ICustomModalProps) {
   const { getETransferAuthToken } = useQueryAuthToken();
@@ -22,6 +23,7 @@ export default function GetMoreACORNSModal({ open, onCancel, ...props }: ICustom
   const [showDeposit, setShowDeposit] = useState(false);
   const [syncLoading, setSyncLoading] = useState(false);
   const isMobile = useIsMobile();
+  const { openGuardianApprove } = useOpenGuardianApprove();
   const textClassName = useMemo(
     () => `${isMobile ? 'text-[16px] leading-[24px]' : 'text-[24px] leading-[32px]'} mb-[12px]`,
     [isMobile],
@@ -73,6 +75,9 @@ export default function GetMoreACORNSModal({ open, onCancel, ...props }: ICustom
               // onCancel?.();
               if ((!isOnChainLogin && walletType === WalletType.portkey) || needSync) {
                 return setSyncLoading(true);
+              }
+              if (openGuardianApprove()) {
+                return;
               }
               await getETransferAuthToken();
               setShowDeposit(true);
