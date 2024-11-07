@@ -39,6 +39,7 @@ const useGetState = () => {
     curBeanPass: infoState.curBeanPass,
     isManagerReadOnly: infoState.isManagerReadOnly,
     guardianListForFirstNeed: infoState.guardianListForFirstNeed,
+    guardianListForFirstNeedForAssetEntrance: infoState.guardianListForFirstNeedForAssetEntrance,
     configInfo,
     chessBoardInfo,
     imageResources,

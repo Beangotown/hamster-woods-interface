@@ -32,6 +32,7 @@ export type InfoStateType = {
   loadingCountdown?: number;
   isManagerReadOnly?: boolean;
   guardianListForFirstNeed?: any[];
+  guardianListForFirstNeedForAssetEntrance?: any[];
 };
 
 export type PageLoadingType = {

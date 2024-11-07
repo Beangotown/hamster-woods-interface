@@ -99,8 +99,6 @@ export default function Game() {
     needSync,
     checkerboardCounts,
     curBeanPass,
-    isManagerReadOnly,
-    guardianListForFirstNeed,
   } = useGetState();
   // console.log('wfs render Game page out', new Date(), isLogin, isOnChainLogin);
   const { getETransferAuthToken } = useQueryAuthToken();
@@ -299,6 +297,13 @@ export default function Game() {
   }, []);
 
   const getChance = useCallback(async () => {
+    console.log('wfs----LoadingModal---getChance');
+    if ((!isOnChainLogin && walletType === WalletType.portkey) || needSync) {
+      return setSyncLoading(true);
+    }
+    if (openGuardianApprove()) {
+      return;
+    }
     if (!playerInfo?.weeklyPurchasedChancesCount) {
       purchaseNoticeTypeRef.current = PurchaseNoticeEnum.getChance;
       setPurchaseNoticeVisible(true);
@@ -307,7 +312,15 @@ export default function Game() {
     updatePrice();
     updateAssetBalance();
     setGetChanceModalVisible(true);
-  }, [playerInfo?.weeklyPurchasedChancesCount, updateAssetBalance, updatePrice]);
+  }, [
+    isOnChainLogin,
+    needSync,
+    openGuardianApprove,
+    playerInfo?.weeklyPurchasedChancesCount,
+    updateAssetBalance,
+    updatePrice,
+    walletType,
+  ]);
 
   const handlePurchase = useCallback(
     async (n: number, chancePrice: number) => {
@@ -369,6 +382,7 @@ export default function Game() {
         resetStart,
         diceCount: curDiceCount,
       });
+      // await clear()
       updateStep();
       setResetStart(false);
       store.dispatch(setChessboardResetStart(false));

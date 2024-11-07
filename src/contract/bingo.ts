@@ -15,8 +15,8 @@ import checkSynchronization from 'utils/checkSynchronization';
 import { getTxResultOnce, getTxResultRetry } from 'utils/getTxResult';
 import { SECONDS_60 } from 'constants/time';
 import { ChainId } from '@portkey/types';
-import { setGuardianListForFirstNeed, setIsManagerReadOnly } from 'redux/reducer/info';
 const { configInfo } = store.getState();
+import { clearManagerReadonlyStatusInMainChain } from 'utils/clearManagerReadonlyStatus';
 
 export enum ContractMethodType {
   SEND,
@@ -112,9 +112,11 @@ export const Play = async ({
       result = finalTxRes.txResult;
     }
 
-    store.dispatch(setGuardianListForFirstNeed([]));
-    store.dispatch(setIsManagerReadOnly(false));
-
+    clearManagerReadonlyStatusInMainChain(
+      store.getState().info.walletInfo?.portkeyInfo?.caInfo?.caAddress,
+      store.getState().info.walletInfo?.portkeyInfo?.caInfo?.caHash,
+      store.getState().info.guardianListForFirstNeed,
+    );
     return {
       TransactionId: transactionId,
       TxResult: result,
@@ -166,8 +168,11 @@ export const PurchaseChance = async ({
       result = finalTxRes.txResult;
     }
 
-    store.dispatch(setGuardianListForFirstNeed([]));
-    store.dispatch(setIsManagerReadOnly(false));
+    clearManagerReadonlyStatusInMainChain(
+      store.getState().info.walletInfo?.portkeyInfo?.caInfo?.caAddress,
+      store.getState().info.walletInfo?.portkeyInfo?.caInfo?.caHash,
+      store.getState().info.guardianListForFirstNeed,
+    );
 
     return {
       TransactionId: transactionId,
