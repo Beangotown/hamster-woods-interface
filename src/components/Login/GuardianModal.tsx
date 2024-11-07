@@ -17,7 +17,7 @@ import { WalletType } from 'constants/index';
 import { AccountType, GuardiansApproved } from '@portkey/services';
 import useWebLogin from 'hooks/useWebLogin';
 import { dispatch, store } from 'redux/store';
-import { setGuardianListForFirstNeed } from 'redux/reducer/info';
+import { setGuardianListForFirstNeed, setGuardianListForFirstNeedForAssetEntrance } from 'redux/reducer/info';
 
 interface IGuardianModalProps {
   networkType: string;
@@ -36,7 +36,6 @@ const GuardianModal = ({ networkType, caHash, originChainId, targetChainId }: IG
   // console.log('wfs----guardianList in GuardianModal', guardianList);
   // console.log('wfs----networkType', networkType);
   // console.log('wfs----caHash', caHash);
-  console.log('wfs----LoadingModal----originChainId-', originChainId);
 
   // const { handleOnChainFinish } = useWebLogin({
   //   signHandle: {},
@@ -67,6 +66,8 @@ const GuardianModal = ({ networkType, caHash, originChainId, targetChainId }: IG
     console.log('wfs----LoadingModal--onTGSignInApprovalSuccess', guardian);
     setShowGuardianApprovalModal(false);
     store.dispatch(setGuardianListForFirstNeed(guardian));
+    store.dispatch(setGuardianListForFirstNeedForAssetEntrance(guardian));
+
     // ConfigProvider.setGlobalConfig({
     //   globalLoadingHandler: {
     //     onSetLoading: (loadingInfo) => {

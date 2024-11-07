@@ -8,9 +8,22 @@ import { useCallback, useState } from 'react';
 import useGetState from 'redux/state/useGetState';
 import { WalletType } from 'types';
 import showMessage from 'utils/setGlobalComponentsInfo';
+import {
+  clearManagerReadonlyStatusInMainChain,
+  clearManagerReadonlyStatusInSideChain,
+} from 'utils/clearManagerReadonlyStatus';
 
 export default function Wallet() {
-  const { isMobile, isOnChainLogin, walletType, needSync } = useGetState();
+  const {
+    isMobile,
+    isOnChainLogin,
+    walletType,
+    needSync,
+    walletInfo,
+    isManagerReadOnly,
+    guardianListForFirstNeed,
+    guardianListForFirstNeedForAssetEntrance,
+  } = useGetState();
   const [syncLoading, setSyncLoading] = useState(false);
   const { openGuardianApprove } = useOpenGuardianApprove();
 
@@ -25,6 +38,27 @@ export default function Wallet() {
     if (openGuardianApprove()) {
       return;
     }
+    await clearManagerReadonlyStatusInMainChain(
+      walletInfo?.portkeyInfo?.caInfo?.caAddress,
+      walletInfo?.portkeyInfo?.caInfo?.caHash,
+      guardianListForFirstNeed,
+    );
+    await clearManagerReadonlyStatusInSideChain(
+      walletInfo?.portkeyInfo?.caInfo?.caAddress,
+      walletInfo?.portkeyInfo?.caInfo?.caHash,
+      guardianListForFirstNeedForAssetEntrance,
+    );
+
+    console.log(
+      'wfs----LoadingModal---checkAccountInitStatus',
+      isMobile,
+      isOnChainLogin,
+      walletType,
+      needSync,
+      walletInfo,
+      isManagerReadOnly,
+    );
+
     showMessage.loading();
     let checkAccountInitStatusRes;
     try {
@@ -40,7 +74,18 @@ export default function Wallet() {
     }
     if (!checkAccountInitStatusRes) return false;
     return true;
-  }, [address, isOnChainLogin, needSync, walletType]);
+  }, [
+    address,
+    guardianListForFirstNeed,
+    guardianListForFirstNeedForAssetEntrance,
+    isManagerReadOnly,
+    isMobile,
+    isOnChainLogin,
+    needSync,
+    openGuardianApprove,
+    walletInfo,
+    walletType,
+  ]);
 
   const handleAsset = async () => {
     const isAbleInit = await checkAccountInitStatus();

@@ -23,6 +23,7 @@ const initialState: InfoStateType = {
   loadingCountdown: 0,
   isManagerReadOnly: false,
   guardianListForFirstNeed: [],
+  guardianListForFirstNeedForAssetEntrance: [],
 };
 
 // Actual Slice
@@ -85,6 +86,9 @@ export const infoSlice = createSlice({
     setGuardianListForFirstNeed(state, action) {
       state.guardianListForFirstNeed = action.payload;
     },
+    setGuardianListForFirstNeedForAssetEntrance(state, action) {
+      state.guardianListForFirstNeedForAssetEntrance = action.payload;
+    },
   },
 
   // Special reducer for hydrating the state. Special case for next-redux-wrapper
@@ -116,6 +120,7 @@ export const {
   setCurBeanPass,
   setIsManagerReadOnly,
   setGuardianListForFirstNeed,
+  setGuardianListForFirstNeedForAssetEntrance,
 } = infoSlice.actions;
 export const selectInfo = (state: AppState) => state.info;
 export default infoSlice.reducer;
