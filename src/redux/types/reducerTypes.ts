@@ -33,7 +33,15 @@ export type InfoStateType = {
   isManagerReadOnly?: boolean;
   guardianListForFirstNeed?: any[];
   guardianListForFirstNeedForAssetEntrance?: any[];
+  currentFnAfterApprove?: CurrentFnAfterApproveType;
 };
+
+export enum CurrentFnAfterApproveType {
+  GO = 'GO',
+  GET_CHANCE = 'GET_CHANCE',
+  TOKEN = 'TOKEN',
+  NONE = 'NONE',
+}
 
 export type PageLoadingType = {
   open: boolean;
