@@ -34,6 +34,7 @@ export type InfoStateType = {
   guardianListForFirstNeed?: any[];
   guardianListForFirstNeedForAssetEntrance?: any[];
   currentFnAfterApprove?: CurrentFnAfterApproveType;
+  isManagerReadOnlyIsExecuteEnd?: boolean;
 };
 
 export enum CurrentFnAfterApproveType {

@@ -1,13 +1,4 @@
-import {
-  AddManagerType,
-  NetworkType,
-  GuardianApprovalModal,
-  getOperationDetails,
-  ConfigProvider,
-  useMultiVerify,
-  useLoginWallet,
-  DIDWalletInfo,
-} from '@portkey/did-ui-react';
+import { NetworkType, GuardianApprovalModal, getOperationDetails } from '@portkey/did-ui-react';
 import { useState, useEffect, useCallback, memo } from 'react';
 import { EE } from 'utils/event';
 import { OperationTypeEnum } from 'types/index';
@@ -17,6 +8,12 @@ import { setGuardianListForFirstNeed, setGuardianListForFirstNeedForAssetEntranc
 import useGetState from 'redux/state/useGetState';
 import { useRouter } from 'next/navigation';
 import { CurrentFnAfterApproveType } from 'redux/types/reducerTypes';
+import {
+  clearManagerReadonlyStatusInMainChain,
+  clearManagerReadonlyStatusInSideChain,
+} from 'utils/clearManagerReadonlyStatus';
+import showMessage from 'utils/setGlobalComponentsInfo';
+import { getHamsterPassClaimClaimable } from 'api/request';
 
 interface IGuardianModalProps {
   networkType: string;
@@ -27,21 +24,10 @@ interface IGuardianModalProps {
   getChance: (args?: boolean) => Promise<void>;
 }
 const GuardianModal = ({ networkType, caHash, originChainId, targetChainId, go, getChance }: IGuardianModalProps) => {
-  const { currentFnAfterApprove } = useGetState();
+  const { currentFnAfterApprove, walletInfo } = useGetState();
   const [showGuardianApprovalModal, setShowGuardianApprovalModal] = useState(false);
   const router = useRouter();
-  // const multiVerify = useMultiVerify();
-
-  // const createWallet = useLoginWallet();
-
   const guardianList = JSON.parse(localStorage.getItem('guardianList') || '[]');
-  // console.log('wfs----guardianList in GuardianModal', guardianList);
-  // console.log('wfs----networkType', networkType);
-  // console.log('wfs----caHash', caHash);
-
-  // const { handleOnChainFinish } = useWebLogin({
-  //   signHandle: {},
-  // });
 
   useEffect(() => {
     const setGuardianApproveHandler = (isShow: boolean) => {
@@ -53,16 +39,36 @@ const GuardianModal = ({ networkType, caHash, originChainId, targetChainId, go, 
     };
   }, []);
 
-  // const handleOnChainFinishWrapper = useCallback(
-  //   async (wallet: DIDWalletInfo) => {
-  //     if (wallet.createType !== 'recovery') {
-  //       handlePortKeyLoginFinish(wallet);
-  //       return;
-  //     }
-  //     await handleOnChainFinish(WalletType.portkey, wallet);
-  //   },
-  //   [handleOnChainFinish],
-  // );
+  const toAsset = useCallback(
+    async (guardian: any) => {
+      let checkAccountInitStatusRes;
+      showMessage.loading();
+      try {
+        await clearManagerReadonlyStatusInMainChain(
+          walletInfo?.portkeyInfo?.caInfo?.caAddress,
+          walletInfo?.portkeyInfo?.caInfo?.caHash,
+          guardian,
+        );
+        await clearManagerReadonlyStatusInSideChain(
+          walletInfo?.portkeyInfo?.caInfo?.caAddress,
+          walletInfo?.portkeyInfo?.caInfo?.caHash,
+          guardian,
+        );
+        checkAccountInitStatusRes = await getHamsterPassClaimClaimable({
+          caAddress: walletInfo?.portkeyInfo?.caInfo?.caAddress ?? '',
+        });
+        showMessage.hideLoading();
+        if (checkAccountInitStatusRes) {
+          router.push('/asset');
+        }
+      } catch (err) {
+        showMessage.hideLoading();
+        console.log('checkBeanPassStatusError:', err);
+        router.push('/asset');
+      }
+    },
+    [router, walletInfo?.portkeyInfo?.caInfo?.caAddress, walletInfo?.portkeyInfo?.caInfo?.caHash],
+  );
 
   const onTGSignInApprovalSuccess = useCallback(
     async (guardian: any) => {
@@ -79,13 +85,13 @@ const GuardianModal = ({ networkType, caHash, originChainId, targetChainId, go, 
           go(false);
           break;
         case CurrentFnAfterApproveType.TOKEN:
-          router.push('/asset');
+          toAsset(guardian);
           break;
         default:
           break;
       }
     },
-    [currentFnAfterApprove, getChance, go, router],
+    [currentFnAfterApprove, getChance, go, toAsset],
   );
 
   return (

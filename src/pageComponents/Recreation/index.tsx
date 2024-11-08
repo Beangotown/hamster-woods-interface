@@ -29,7 +29,13 @@ import {
 import useWebLogin from 'hooks/useWebLogin';
 import showMessage from 'utils/setGlobalComponentsInfo';
 import BoardLeft from './components/BoardLeft';
-import { setCurBeanPass, setPlayerInfo, setIsManagerReadOnly, setCurrentFnAfterApprove } from 'redux/reducer/info';
+import {
+  setCurBeanPass,
+  setPlayerInfo,
+  setIsManagerReadOnly,
+  setCurrentFnAfterApprove,
+  setIsManagerReadOnlyIsExecuteEnd,
+} from 'redux/reducer/info';
 import { IBalance, IBeanPassListItem, IContractError, WalletType } from 'types';
 import ShowNFTModal from 'components/CommonModal/ShowNFTModal';
 import { dispatch, store } from 'redux/store';
@@ -683,6 +689,8 @@ export default function Game() {
         });
         console.log('wfs----LoadingModal--getIsManagerReadOnly', rs);
         store.dispatch(setIsManagerReadOnly(!!rs?.data));
+        store.dispatch(setIsManagerReadOnlyIsExecuteEnd(true));
+        showMessage.hideLoading();
       } catch (e) {
         console.log('wfs----LoadingModal--err', e);
       }
