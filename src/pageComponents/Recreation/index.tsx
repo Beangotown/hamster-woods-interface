@@ -6,6 +6,7 @@ import styles from './index.module.css';
 
 import Checkerboard from './components/Checkerboard';
 import Role from './components/Role';
+import { CurrentFnAfterApproveType } from 'redux/types/reducerTypes';
 
 import Board from './components/Board';
 import GoButton, { Status } from './components/GoButton';
@@ -28,7 +29,7 @@ import {
 import useWebLogin from 'hooks/useWebLogin';
 import showMessage from 'utils/setGlobalComponentsInfo';
 import BoardLeft from './components/BoardLeft';
-import { setCurBeanPass, setPlayerInfo, setIsManagerReadOnly } from 'redux/reducer/info';
+import { setCurBeanPass, setPlayerInfo, setIsManagerReadOnly, setCurrentFnAfterApprove } from 'redux/reducer/info';
 import { IBalance, IBeanPassListItem, IContractError, WalletType } from 'types';
 import ShowNFTModal from 'components/CommonModal/ShowNFTModal';
 import { dispatch, store } from 'redux/store';
@@ -66,6 +67,7 @@ import GuardianModal from 'components/Login/GuardianModal';
 import ContractRequest from 'contract/contractRequest';
 import { EE } from 'utils/event';
 import useOpenGuardianApprove from 'hooks/useOpenGuardianApprove';
+import { getCaContractBySideChain } from 'utils/clearManagerReadonlyStatus';
 
 export default function Game() {
   useEffect(() => {
@@ -296,31 +298,36 @@ export default function Game() {
     });
   }, []);
 
-  const getChance = useCallback(async () => {
-    console.log('wfs----LoadingModal---getChance');
-    if ((!isOnChainLogin && walletType === WalletType.portkey) || needSync) {
-      return setSyncLoading(true);
-    }
-    if (openGuardianApprove()) {
-      return;
-    }
-    if (!playerInfo?.weeklyPurchasedChancesCount) {
-      purchaseNoticeTypeRef.current = PurchaseNoticeEnum.getChance;
-      setPurchaseNoticeVisible(true);
-      return;
-    }
-    updatePrice();
-    updateAssetBalance();
-    setGetChanceModalVisible(true);
-  }, [
-    isOnChainLogin,
-    needSync,
-    openGuardianApprove,
-    playerInfo?.weeklyPurchasedChancesCount,
-    updateAssetBalance,
-    updatePrice,
-    walletType,
-  ]);
+  const getChance = useCallback(
+    async (needCheck = true) => {
+      console.log('wfs----LoadingModal---getChance');
+      if ((!isOnChainLogin && walletType === WalletType.portkey) || needSync) {
+        return setSyncLoading(true);
+      }
+      if (needCheck && openGuardianApprove()) {
+        store.dispatch(setCurrentFnAfterApprove(CurrentFnAfterApproveType.GET_CHANCE));
+        return;
+      }
+      if (!playerInfo?.weeklyPurchasedChancesCount) {
+        purchaseNoticeTypeRef.current = PurchaseNoticeEnum.getChance;
+        setPurchaseNoticeVisible(true);
+        return;
+      }
+      console.log('wfs----LoadingModal---getChance2');
+      updatePrice();
+      updateAssetBalance();
+      setGetChanceModalVisible(true);
+    },
+    [
+      isOnChainLogin,
+      needSync,
+      openGuardianApprove,
+      playerInfo?.weeklyPurchasedChancesCount,
+      updateAssetBalance,
+      updatePrice,
+      walletType,
+    ],
+  );
 
   const handlePurchase = useCallback(
     async (n: number, chancePrice: number) => {
@@ -346,8 +353,8 @@ export default function Game() {
     [address, configInfo?.beanGoTownContractAddress, updatePlayerInformation],
   );
 
-  const go = async () => {
-    console.log('wfs----LoadingModal--go', isOnChainLogin, walletType === WalletType.portkey, needSync);
+  const go = async (needCheck = true) => {
+    console.log('wfs----LoadingModal--go', isOnChainLogin, needCheck, needSync);
     if ((!isOnChainLogin && walletType === WalletType.portkey) || needSync) {
       return setSyncLoading(true);
     }
@@ -355,7 +362,8 @@ export default function Game() {
     //   EE.emit('SET_GUARDIAN_APPROVAL_MODAL', true);
     //   return;
     // }
-    if (openGuardianApprove()) {
+    if (needCheck && openGuardianApprove()) {
+      store.dispatch(setCurrentFnAfterApprove(CurrentFnAfterApproveType.GO));
       return;
     }
     if (goStatus !== Status.NONE) {
@@ -533,7 +541,7 @@ export default function Game() {
 
   useEffect(() => {
     console.log(
-      'wfs Game page isLogin',
+      'wfs----LoadingModal1',
       isLogin,
       'isOnChainLogin',
       isOnChainLogin,
@@ -659,18 +667,25 @@ export default function Game() {
       return;
     }
     async function getIsManagerReadOnly() {
+      const caIns = await getCaContractBySideChain();
       console.log(
-        'wfs----LoadingModal---chainInfo.caContractAddress',
+        'wfs----LoadingModal---chainInfo.caContractAddress----1111',
+        caIns.address,
         walletInfo?.portkeyInfo?.caInfo?.caHash,
         walletInfo?.portkeyInfo?.walletInfo?.address,
         did.didWallet.managementAccount?.address,
+        isOnChainLogin,
       );
-      const rs = await ContractRequest.get().caContract?.callViewMethod('IsManagerReadOnly', {
-        caHash: walletInfo?.portkeyInfo?.caInfo?.caHash,
-        manager: walletInfo?.portkeyInfo?.walletInfo?.address,
-      });
-      console.log('wfs----LoadingModal--getIsManagerReadOnly', rs);
-      store.dispatch(setIsManagerReadOnly(!!rs?.data));
+      try {
+        const rs = await caIns.callViewMethod('IsManagerReadOnly', {
+          caHash: walletInfo?.portkeyInfo?.caInfo?.caHash,
+          manager: walletInfo?.portkeyInfo?.walletInfo?.address,
+        });
+        console.log('wfs----LoadingModal--getIsManagerReadOnly', rs);
+        store.dispatch(setIsManagerReadOnly(!!rs?.data));
+      } catch (e) {
+        console.log('wfs----LoadingModal--err', e);
+      }
     }
     getIsManagerReadOnly();
   }, [isOnChainLogin, walletInfo?.portkeyInfo?.caInfo?.caHash, walletInfo?.portkeyInfo?.walletInfo?.address]);
@@ -835,6 +850,8 @@ export default function Game() {
         caHash={walletInfo?.portkeyInfo?.caInfo?.caHash}
         originChainId={walletInfo?.portkeyInfo?.chainId}
         targetChainId={configInfo?.curChain ?? ''}
+        go={go}
+        getChance={getChance}
       />
     </>
   );

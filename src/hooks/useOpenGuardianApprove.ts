@@ -7,7 +7,7 @@ const useOpenGuardianApprove = () => {
   const { isManagerReadOnly, guardianListForFirstNeed, walletType } = useGetState();
   const openGuardianApprove = useCallback(() => {
     console.log(
-      'wfs----LoadingModal---useOpenGuardianApprove',
+      'wfs----LoadingModal---useOpenGuardianApprove11',
       isManagerReadOnly,
       guardianListForFirstNeed?.length === 0,
       walletType,

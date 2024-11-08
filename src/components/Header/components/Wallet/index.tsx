@@ -12,6 +12,9 @@ import {
   clearManagerReadonlyStatusInMainChain,
   clearManagerReadonlyStatusInSideChain,
 } from 'utils/clearManagerReadonlyStatus';
+import { store } from 'redux/store';
+import { setCurrentFnAfterApprove } from 'redux/reducer/info';
+import { CurrentFnAfterApproveType } from 'redux/types/reducerTypes';
 
 export default function Wallet() {
   const {
@@ -88,6 +91,7 @@ export default function Wallet() {
   ]);
 
   const handleAsset = async () => {
+    store.dispatch(setCurrentFnAfterApprove(CurrentFnAfterApproveType.TOKEN));
     const isAbleInit = await checkAccountInitStatus();
     isAbleInit && router.push('/asset');
   };

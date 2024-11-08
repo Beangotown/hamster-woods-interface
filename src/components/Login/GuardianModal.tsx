@@ -12,22 +12,24 @@ import { useState, useEffect, useCallback, memo } from 'react';
 import { EE } from 'utils/event';
 import { OperationTypeEnum } from 'types/index';
 import { ChainId } from '@portkey/types';
-import { DEFAULT_PIN } from 'constants/login';
-import { WalletType } from 'constants/index';
-import { AccountType, GuardiansApproved } from '@portkey/services';
-import useWebLogin from 'hooks/useWebLogin';
-import { dispatch, store } from 'redux/store';
+import { store } from 'redux/store';
 import { setGuardianListForFirstNeed, setGuardianListForFirstNeedForAssetEntrance } from 'redux/reducer/info';
+import useGetState from 'redux/state/useGetState';
+import { useRouter } from 'next/navigation';
+import { CurrentFnAfterApproveType } from 'redux/types/reducerTypes';
 
 interface IGuardianModalProps {
   networkType: string;
   caHash: string;
   originChainId: ChainId;
   targetChainId: ChainId;
+  go: (args?: boolean) => Promise<void>;
+  getChance: (args?: boolean) => Promise<void>;
 }
-const GuardianModal = ({ networkType, caHash, originChainId, targetChainId }: IGuardianModalProps) => {
+const GuardianModal = ({ networkType, caHash, originChainId, targetChainId, go, getChance }: IGuardianModalProps) => {
+  const { currentFnAfterApprove } = useGetState();
   const [showGuardianApprovalModal, setShowGuardianApprovalModal] = useState(false);
-
+  const router = useRouter();
   // const multiVerify = useMultiVerify();
 
   // const createWallet = useLoginWallet();
@@ -62,32 +64,29 @@ const GuardianModal = ({ networkType, caHash, originChainId, targetChainId }: IG
   //   [handleOnChainFinish],
   // );
 
-  const onTGSignInApprovalSuccess = useCallback(async (guardian: any) => {
-    console.log('wfs----LoadingModal--onTGSignInApprovalSuccess', guardian);
-    setShowGuardianApprovalModal(false);
-    store.dispatch(setGuardianListForFirstNeed(guardian));
-    store.dispatch(setGuardianListForFirstNeedForAssetEntrance(guardian));
+  const onTGSignInApprovalSuccess = useCallback(
+    async (guardian: any) => {
+      setShowGuardianApprovalModal(false);
+      store.dispatch(setGuardianListForFirstNeed(guardian));
+      store.dispatch(setGuardianListForFirstNeedForAssetEntrance(guardian));
 
-    // ConfigProvider.setGlobalConfig({
-    //   globalLoadingHandler: {
-    //     onSetLoading: (loadingInfo) => {
-    //       console.log(loadingInfo, 'loadingInfo===');
-    //     },
-    //   },
-    // });
-    // setShowGuardianApprovalModal(false);
-    // const params = {
-    //   pin: DEFAULT_PIN,
-    //   type: 'recovery' as AddManagerType,
-    //   chainId: originChainId,
-    //   accountType: 'Telegram' as AccountType,
-    //   guardianIdentifier: localStorage.getItem('identifierRef') || '',
-    //   guardianApprovedList: guardian,
-    //   source: 5,
-    // };
-    // const didWallet = await createWallet(params);
-    // didWallet && handleOnChainFinishWrapper(didWallet);
-  }, []);
+      console.log('wfs----LoadingModal--onTGSignInApprovalSuccess', guardian, currentFnAfterApprove);
+      switch (currentFnAfterApprove) {
+        case CurrentFnAfterApproveType.GET_CHANCE:
+          getChance(false);
+          break;
+        case CurrentFnAfterApproveType.GO:
+          go(false);
+          break;
+        case CurrentFnAfterApproveType.TOKEN:
+          router.push('/asset');
+          break;
+        default:
+          break;
+      }
+    },
+    [currentFnAfterApprove, getChance, go, router],
+  );
 
   return (
     <GuardianApprovalModal

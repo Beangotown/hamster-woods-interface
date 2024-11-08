@@ -3,6 +3,7 @@ import { AppState } from 'redux/store';
 import { HYDRATE } from 'next-redux-wrapper';
 import { InfoStateType, LoginStatus } from 'redux/types/reducerTypes';
 import { WalletType } from 'types';
+import { CurrentFnAfterApproveType } from 'redux/types/reducerTypes';
 
 const initialState: InfoStateType = {
   isMobile: false,
@@ -24,6 +25,8 @@ const initialState: InfoStateType = {
   isManagerReadOnly: false,
   guardianListForFirstNeed: [],
   guardianListForFirstNeedForAssetEntrance: [],
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  currentFnAfterApprove: CurrentFnAfterApproveType.NONE,
 };
 
 // Actual Slice
@@ -89,6 +92,9 @@ export const infoSlice = createSlice({
     setGuardianListForFirstNeedForAssetEntrance(state, action) {
       state.guardianListForFirstNeedForAssetEntrance = action.payload;
     },
+    setCurrentFnAfterApprove(state, action) {
+      state.currentFnAfterApprove = action.payload;
+    },
   },
 
   // Special reducer for hydrating the state. Special case for next-redux-wrapper
@@ -121,6 +127,7 @@ export const {
   setIsManagerReadOnly,
   setGuardianListForFirstNeed,
   setGuardianListForFirstNeedForAssetEntrance,
+  setCurrentFnAfterApprove,
 } = infoSlice.actions;
 export const selectInfo = (state: AppState) => state.info;
 export default infoSlice.reducer;

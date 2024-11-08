@@ -62,4 +62,4 @@ const clearManagerReadonlyStatusInSideChain = async (caAddress = '', caHash = ''
   store.dispatch(setIsManagerReadOnly(false));
 };
 
-export { clearManagerReadonlyStatusInMainChain, clearManagerReadonlyStatusInSideChain };
+export { clearManagerReadonlyStatusInMainChain, clearManagerReadonlyStatusInSideChain, getCaContractBySideChain };
