@@ -8,25 +8,13 @@ import { useCallback, useState } from 'react';
 import useGetState from 'redux/state/useGetState';
 import { WalletType } from 'types';
 import showMessage from 'utils/setGlobalComponentsInfo';
-import {
-  clearManagerReadonlyStatusInMainChain,
-  clearManagerReadonlyStatusInSideChain,
-} from 'utils/clearManagerReadonlyStatus';
+
 import { store } from 'redux/store';
 import { setCurrentFnAfterApprove } from 'redux/reducer/info';
 import { CurrentFnAfterApproveType } from 'redux/types/reducerTypes';
 
 export default function Wallet() {
-  const {
-    isMobile,
-    isOnChainLogin,
-    walletType,
-    needSync,
-    walletInfo,
-    isManagerReadOnly,
-    guardianListForFirstNeed,
-    guardianListForFirstNeedForAssetEntrance,
-  } = useGetState();
+  const { isMobile, isOnChainLogin, walletType, needSync } = useGetState();
   const [syncLoading, setSyncLoading] = useState(false);
   const { openGuardianApprove } = useOpenGuardianApprove();
 
@@ -41,26 +29,6 @@ export default function Wallet() {
     if (openGuardianApprove()) {
       return;
     }
-    await clearManagerReadonlyStatusInMainChain(
-      walletInfo?.portkeyInfo?.caInfo?.caAddress,
-      walletInfo?.portkeyInfo?.caInfo?.caHash,
-      guardianListForFirstNeed,
-    );
-    await clearManagerReadonlyStatusInSideChain(
-      walletInfo?.portkeyInfo?.caInfo?.caAddress,
-      walletInfo?.portkeyInfo?.caInfo?.caHash,
-      guardianListForFirstNeedForAssetEntrance,
-    );
-
-    console.log(
-      'wfs----LoadingModal---checkAccountInitStatus',
-      isMobile,
-      isOnChainLogin,
-      walletType,
-      needSync,
-      walletInfo,
-      isManagerReadOnly,
-    );
 
     showMessage.loading();
     let checkAccountInitStatusRes;
@@ -77,18 +45,7 @@ export default function Wallet() {
     }
     if (!checkAccountInitStatusRes) return false;
     return true;
-  }, [
-    address,
-    guardianListForFirstNeed,
-    guardianListForFirstNeedForAssetEntrance,
-    isManagerReadOnly,
-    isMobile,
-    isOnChainLogin,
-    needSync,
-    openGuardianApprove,
-    walletInfo,
-    walletType,
-  ]);
+  }, [address, isOnChainLogin, needSync, openGuardianApprove, walletType]);
 
   const handleAsset = async () => {
     store.dispatch(setCurrentFnAfterApprove(CurrentFnAfterApproveType.TOKEN));

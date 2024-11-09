@@ -27,6 +27,7 @@ const initialState: InfoStateType = {
   guardianListForFirstNeedForAssetEntrance: [],
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   currentFnAfterApprove: CurrentFnAfterApproveType.NONE,
+  isManagerReadOnlyIsExecuteEnd: false,
 };
 
 // Actual Slice
@@ -95,6 +96,9 @@ export const infoSlice = createSlice({
     setCurrentFnAfterApprove(state, action) {
       state.currentFnAfterApprove = action.payload;
     },
+    setIsManagerReadOnlyIsExecuteEnd(state, action) {
+      state.isManagerReadOnlyIsExecuteEnd = action.payload;
+    },
   },
 
   // Special reducer for hydrating the state. Special case for next-redux-wrapper
@@ -128,6 +132,7 @@ export const {
   setGuardianListForFirstNeed,
   setGuardianListForFirstNeedForAssetEntrance,
   setCurrentFnAfterApprove,
+  setIsManagerReadOnlyIsExecuteEnd,
 } = infoSlice.actions;
 export const selectInfo = (state: AppState) => state.info;
 export default infoSlice.reducer;

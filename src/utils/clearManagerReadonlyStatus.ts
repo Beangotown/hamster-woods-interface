@@ -35,29 +35,29 @@ const getCaContractByMainChain = async () => {
 };
 
 const clearManagerReadonlyStatusInMainChain = async (caAddress = '', caHash = '', guardiansApproved?: any[]) => {
+  console.log('wfs----LoadingModal---clearManagerReadonlyStatusInMainChain', caAddress, caHash, guardiansApproved);
   if (!guardiansApproved || guardiansApproved.length === 0) {
     return;
   }
   const ca = await getCaContractByMainChain();
-  const rs = await ca.callSendMethod('RemoveReadOnlyManager', caAddress, {
+  await ca.callSendMethod('RemoveReadOnlyManager', caAddress, {
     caHash,
     guardiansApproved: guardiansApproved,
   });
-  console.log('wfs----LoadingModal---clearManagerReadonlyStatusInMainChain', caAddress, caHash, guardiansApproved, rs);
   store.dispatch(setGuardianListForFirstNeed([]));
   store.dispatch(setIsManagerReadOnly(false));
 };
 
 const clearManagerReadonlyStatusInSideChain = async (caAddress = '', caHash = '', guardiansApproved?: any[]) => {
+  console.log('wfs----LoadingModal---clearManagerReadonlyStatusInSideChain', caAddress, caHash, guardiansApproved);
   if (!guardiansApproved || guardiansApproved.length === 0) {
     return;
   }
   const ca = await getCaContractBySideChain();
-  const rs = await ca.callSendMethod('RemoveReadOnlyManager', caAddress, {
+  await ca.callSendMethod('RemoveReadOnlyManager', caAddress, {
     caHash,
     guardiansApproved: guardiansApproved,
   });
-  console.log('wfs----LoadingModal---clearManagerReadonlyStatusInSideChain', caAddress, caHash, guardiansApproved, rs);
   store.dispatch(setGuardianListForFirstNeedForAssetEntrance([]));
   store.dispatch(setIsManagerReadOnly(false));
 };

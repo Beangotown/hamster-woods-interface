@@ -17,6 +17,7 @@ import { SECONDS_60 } from 'constants/time';
 import { ChainId } from '@portkey/types';
 const { configInfo } = store.getState();
 import { clearManagerReadonlyStatusInMainChain } from 'utils/clearManagerReadonlyStatus';
+import { setGuardianListForFirstNeedForAssetEntrance } from 'redux/reducer/info';
 
 export enum ContractMethodType {
   SEND,
@@ -111,6 +112,7 @@ export const Play = async ({
       });
       result = finalTxRes.txResult;
     }
+    store.dispatch(setGuardianListForFirstNeedForAssetEntrance([]));
 
     clearManagerReadonlyStatusInMainChain(
       store.getState().info.walletInfo?.portkeyInfo?.caInfo?.caAddress,
@@ -167,6 +169,7 @@ export const PurchaseChance = async ({
       });
       result = finalTxRes.txResult;
     }
+    store.dispatch(setGuardianListForFirstNeedForAssetEntrance([]));
 
     clearManagerReadonlyStatusInMainChain(
       store.getState().info.walletInfo?.portkeyInfo?.caInfo?.caAddress,

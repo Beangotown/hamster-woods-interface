@@ -41,6 +41,7 @@ const useGetState = () => {
     guardianListForFirstNeed: infoState.guardianListForFirstNeed,
     guardianListForFirstNeedForAssetEntrance: infoState.guardianListForFirstNeedForAssetEntrance,
     currentFnAfterApprove: infoState.currentFnAfterApprove,
+    isManagerReadOnlyIsExecuteEnd: infoState.isManagerReadOnlyIsExecuteEnd,
     configInfo,
     chessBoardInfo,
     imageResources,
