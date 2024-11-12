@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const withPlugins = require('next-compose-plugins');
-const { NEXT_PUBLIC_APP_ENV } = process.env;
+const { NEXT_PUBLIC_APP_ENV, NEXT_PUBLIC_STANDALONE } = process.env;
 const pluginConfig = require('./build.config/plugin');
 const development = require('./build.config/development');
 const production = require('./build.config/production');
@@ -17,6 +17,10 @@ module.exports = withPlugins(
   pluginConfig,
   withBundleAnalyzer({
     ...config,
-    // output: 'standalone',  // TODO after updating Dockerfile
+    ...(NEXT_PUBLIC_STANDALONE
+      ? {
+          output: 'standalone',
+        }
+      : {}),
   }),
 );
