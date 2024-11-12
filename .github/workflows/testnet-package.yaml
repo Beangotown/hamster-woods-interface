@@ -38,6 +38,7 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: |
             ENVIRONMENT=testnet
+            APP_ENV=test
   dispatch:
     runs-on: beangotown-runner
     needs: build-and-push-image
