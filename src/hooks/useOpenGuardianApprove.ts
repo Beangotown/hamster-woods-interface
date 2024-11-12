@@ -14,7 +14,7 @@ const useOpenGuardianApprove = () => {
       walletType,
       isManagerReadOnlyIsExecuteEnd,
     );
-    if (!isManagerReadOnlyIsExecuteEnd) {
+    if (!isManagerReadOnlyIsExecuteEnd && walletType === WalletType.portkey) {
       showMessage.loading();
       return true;
     } else {
