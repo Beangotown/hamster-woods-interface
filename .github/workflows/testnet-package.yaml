@@ -1,9 +1,9 @@
-name: Build and Push Image
+name: Build and Push Image - testnet
 on:
   push:
     branches: ['dev']
 jobs:
-  build-and-push-image:
+  build-and-push-image-testnet:
     runs-on: beangotown-runner
     permissions:
       contents: read
@@ -41,7 +41,7 @@ jobs:
             APP_ENV=test
   dispatch:
     runs-on: beangotown-runner
-    needs: build-and-push-image
+    needs: build-and-push-image-testnet
     steps:
       - name: Deploy
         uses: actions/github-script@v6
