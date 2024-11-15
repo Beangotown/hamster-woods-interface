@@ -1,7 +1,6 @@
 name: Build Image on demand
 on:
   workflow_dispatch:
-  push:
 jobs:
   build-image-on-demand:
     runs-on: beangotown-runner
