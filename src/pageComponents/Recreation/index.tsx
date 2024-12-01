@@ -13,19 +13,12 @@ import GoButton, { Status } from './components/GoButton';
 import { ANIMATION_DURATION } from 'constants/animation';
 import useGetState from 'redux/state/useGetState';
 import RecreationModal, { RecreationModalType } from './components/RecreationModal';
-import { useDebounce, useDeepCompareEffect, useEffectOnce, useWindowSize } from 'react-use';
+import { useDebounce, useDeepCompareEffect, useWindowSize } from 'react-use';
 import { GetBeanPassStatus, ShowBeanPassType } from 'components/CommonModal/type';
 import GetBeanPassModal from 'components/CommonModal/GetBeanPassModal';
 import { useAddress } from 'hooks/useAddress';
 import { useRouter } from 'next/navigation';
-import {
-  fetchBalance,
-  fetchBeanPassList,
-  fetchPrice,
-  getDailyTask,
-  getWeeklyTask,
-  receiveHamsterPassNFT,
-} from 'api/request';
+import { fetchBalance, fetchBeanPassList, fetchPrice, receiveHamsterPassNFT } from 'api/request';
 import useWebLogin from 'hooks/useWebLogin';
 import showMessage from 'utils/setGlobalComponentsInfo';
 import BoardLeft from './components/BoardLeft';
@@ -55,7 +48,6 @@ import CheckerboardBottom from './components/CheckerboardBottom';
 import play from './utils/play';
 import GetChanceModal from 'components/GetChanceModal';
 import CountDownModal from 'components/CountDownModal';
-import GetMoreACORNSModal from 'components/CommonModal/GetMoreACORNSModal';
 import LockedAcornsModal from 'components/LockedAcornsModal';
 import PurchaseNoticeModal, { PurchaseNoticeEnum } from 'components/PurchaseNoticeModal';
 import { PurchaseChance } from 'contract/bingo';
@@ -65,13 +57,11 @@ import { addPrefixSuffix } from 'utils/addressFormatting';
 import { checkerboardData } from 'constants/checkerboardData';
 import DepositModal from 'components/Deposit';
 import { message } from 'antd';
-import { getChainInfo, handleErrorMessage, did, TelegramPlatform } from '@portkey/did-ui-react';
+import { handleErrorMessage, did } from '@portkey/did-ui-react';
 import { useQueryAuthToken } from 'hooks/authToken';
 import LoadingModal from 'components/LoadingModal';
 import { useLoadingCountdown } from 'hooks/useCountDown';
 import GuardianModal from 'components/Login/GuardianModal';
-import ContractRequest from 'contract/contractRequest';
-import { EE } from 'utils/event';
 import useOpenGuardianApprove from 'hooks/useOpenGuardianApprove';
 import { getCaContractBySideChain } from 'utils/clearManagerReadonlyStatus';
 
@@ -710,7 +700,7 @@ export default function Game() {
         className={`${styles.game} cursor-custom relative z-[1] ${isMobile && 'flex-col'}`}>
         {!isMobile && <BoardLeft />}
         <div
-          className={`${styles['game__content']} flex overflow-hidden ${
+          className={`flex overflow-hidden ${
             isMobile ? 'w-full flex-1' : 'h-full w-[40%] min-w-[500Px] max-w-[784Px]'
           }`}>
           {isMobile && <Board hasNft={hasNft} onNftClick={onNftClick} />}

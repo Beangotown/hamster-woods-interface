@@ -67,7 +67,7 @@ import useGetState from 'redux/state/useGetState';
 import { store } from 'redux/store';
 import { LoginStatus } from 'redux/types/reducerTypes';
 import { OperationTypeEnum, SignInDesignType, SocialLoginType, TSignUpVerifier } from 'types/index';
-import { sleep } from 'utils/common';
+import { isTelegramPlatform, sleep } from 'utils/common';
 import { getProto } from 'utils/deserializeLog';
 import discoverUtils from 'utils/discoverUtils';
 import { handleSDKLogoutOffChain } from 'utils/handleLogout';
@@ -108,12 +108,6 @@ export default function Login() {
   const [caHash, setCaHash] = useState<string>('');
   const caInfoRef = useRef<{ caAddress: string; caHash: string }>({ caAddress: '', caHash: '' });
   // const [guardianList, setGuardianList] = useState<UserGuardianStatus[]>();
-  const multiVerify = useMultiVerify();
-  const isTelegramPlatform = useMemo(() => {
-    // TODO test data
-    // return true;
-    return TelegramPlatform.isTelegramPlatform();
-  }, []);
 
   const [showPageLoading, setShowPageLoading] = useState(false);
 
@@ -319,36 +313,6 @@ export default function Login() {
 
   const router = useRouter();
 
-  // const onTGSignInApprovalSuccess = useCallback(
-  //   async (guardian: any) => {
-  //     ConfigProvider.setGlobalConfig({
-  //       globalLoadingHandler: {
-  //         onSetLoading: (loadingInfo) => {
-  //           console.log(loadingInfo, 'loadingInfo===');
-  //         },
-  //       },
-  //     });
-  //     setApprovalVisible(false);
-  //     handleFinish(WalletType.portkey, {
-  //       pin: DEFAULT_PIN,
-  //       chainId: originChainId,
-  //       caInfo: caInfoRef.current,
-  //     });
-  //     const res = await multiVerify(guardian);
-  //     const params = {
-  //       pin: DEFAULT_PIN,
-  //       type: 'recovery' as AddManagerType,
-  //       chainId: originChainId,
-  //       accountType: 'Telegram' as AccountType,
-  //       guardianIdentifier: identifierRef.current || '',
-  //       guardianApprovedList: res as GuardiansApproved[],
-  //     };
-  //     const didWallet = await createWallet(params);
-
-  //     didWallet && handleOnChainFinishWrapper(didWallet);
-  //   },
-  //   [createWallet, handleFinish, handleOnChainFinishWrapper, multiVerify, originChainId],
-  // );
   useEffect(() => {
     console.log('wfs Login useEffect1 isLogin', isLogin, 'isOnChainLogin', isOnChainLogin);
     if (isLogin || isOnChainLogin) {
@@ -360,8 +324,6 @@ export default function Login() {
   const isInIOS = isMobile().apple.device;
 
   const isInApp = isPortkeyApp();
-
-  // const [_isWalletExist, setIsWalletExist] = useState(false);
 
   useEffect(() => {
     if (typeof window !== undefined) {
@@ -882,23 +844,6 @@ export default function Login() {
         isShowScan={true}
         defaultChainId={curChain}
       />
-
-      {/* {guardianList?.length && (
-        <GuardianApprovalModal
-          open={approvalVisible}
-          isAsyncVerify
-          networkType={network as NetworkType}
-          caHash={caHash}
-          originChainId={originChainId}
-          targetChainId={curChain}
-          guardianList={guardianList}
-          operationType={OperationTypeEnum.communityRecovery}
-          operationDetails={getOperationDetails(OperationTypeEnum.communityRecovery)}
-          onClose={() => setApprovalVisible(false)}
-          onBack={() => setApprovalVisible(false)}
-          onApprovalSuccess={onTGSignInApprovalSuccess}
-        />
-      )} */}
 
       <Unlock
         keyboard

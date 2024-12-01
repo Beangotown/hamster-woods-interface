@@ -25,6 +25,7 @@ import useGetState from 'redux/state/useGetState';
 import { LoginStatus } from 'redux/types/reducerTypes';
 import { getCurrentIp } from 'utils/ip';
 import { StorageUtils } from 'utils/storage.utils';
+import { isTelegramPlatform } from 'utils/common';
 
 did.setConfig({
   referralInfo: {
@@ -70,7 +71,7 @@ const Layout = dynamic(
         const event = 'onorientationchange' in window ? 'orientationchange' : 'resize';
         const fn = function () {
           const isMobile =
-            TelegramPlatform.isTelegramPlatform() ||
+            isTelegramPlatform ||
             /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
           const width = docEle.clientWidth;
           const unitWidth = isMobile ? 390 : 1920;
