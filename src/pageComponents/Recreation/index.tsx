@@ -86,6 +86,7 @@ export default function Game() {
     isMobile,
     isLogin,
     isOnChainLogin,
+    isTgInit,
     playerInfo,
     walletType,
     walletInfo,
@@ -548,18 +549,19 @@ export default function Game() {
       // 'needSync',
       // needSync,
     );
-    if (!isLogin && !isOnChainLogin) {
+    if (!isLogin && !isOnChainLogin && !isTgInit) {
       router.push('/login');
     } else {
       if (walletType !== WalletType.unknown && walletInfo) {
         initContractAndCheckBeanPass();
       }
     }
-  }, [initContractAndCheckBeanPass, isLogin, isOnChainLogin, router, walletInfo, walletType]);
+  }, [initContractAndCheckBeanPass, isLogin, isOnChainLogin, router, walletInfo, walletType, isTgInit]);
 
   useEffect(() => {
+    if (isTgInit) return;
     initCheckerboard();
-  }, [hasNft, checkerboardData]);
+  }, [isTgInit, initCheckerboard]);
 
   useEffect(() => {
     if (!isOnChainLogin && walletType === WalletType.portkey) {
@@ -581,19 +583,12 @@ export default function Game() {
   }, [isOnChainLogin]);
 
   useEffect(() => {
+    if (isTgInit) return;
     updateAssetBalance();
-  }, [updateAssetBalance]);
-
-  // useEffect(() => {
-  //   if (address) {
-  //     getModalInfo({
-  //       isHalloween: configInfo?.isHalloween,
-  //       caAddress: address,
-  //     });
-  //   }
-  // }, [address]);
+  }, [updateAssetBalance, isTgInit]);
 
   useDeepCompareEffect(() => {
+    if (isTgInit) return;
     setPlayableCount(playerInfo?.playableCount || 0);
     if (!hasNft || !sumScore || moving) {
       return setGoStatus(Status.DISABLED);
@@ -608,7 +603,7 @@ export default function Game() {
     // } else {
     //   setGoStatus(Status.DISABLED);
     // }
-  }, [hasNft, moving, goLoading, playerInfo]);
+  }, [hasNft, moving, goLoading, playerInfo, isTgInit]);
 
   const onShowNFTModalCancel = () => {
     if (nftModalType === ShowBeanPassType.Success) {
@@ -618,6 +613,7 @@ export default function Game() {
   };
 
   const onNftClick = async () => {
+    if (isTgInit) return;
     if (hasNft) {
       setNFTModalType(ShowBeanPassType.Display);
       setIsShowNFT(true);
@@ -650,13 +646,14 @@ export default function Game() {
   }, [address]);
 
   useEffect(() => {
+    if (isTgInit) return;
     if (playerInfo?.hamsterPassOwned !== undefined) {
       handleHasNft(playerInfo?.hamsterPassOwned || false);
       if (playerInfo?.hamsterPassOwned) {
         getHamsterPass();
       }
     }
-  }, [playerInfo?.hamsterPassOwned, address, handleHasNft, getHamsterPass]);
+  }, [playerInfo?.hamsterPassOwned, address, handleHasNft, getHamsterPass, isTgInit]);
 
   useEffect(() => {
     if (!isOnChainLogin) {
@@ -761,7 +758,10 @@ export default function Game() {
               go={go}
               getChance={getChance}
               getMoreAcorns={showDepositModal}
-              showLockedAcorns={() => setLockedAcornsVisible(true)}
+              showLockedAcorns={() => {
+                if (isTgInit) return;
+                setLockedAcornsVisible(true);
+              }}
               purchasedChancesCount={playerInfo?.purchasedChancesCount}
             />
           </BoardRight>

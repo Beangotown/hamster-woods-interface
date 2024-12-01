@@ -59,7 +59,7 @@ const Layout = dynamic(
       // }, []);
       // return null;
       const { children } = props;
-      const { isInit, isLogin, isOnChainLogin } = useGetState();
+      const { isInit, isLogin, isOnChainLogin, isTgInit } = useGetState();
       const [isMobileDevice, setIsMobileDevice] = useState(false);
       const [isFetchFinished, setIsFetchFinished] = useState(false);
 
@@ -96,7 +96,7 @@ const Layout = dynamic(
 
       useEffect(() => {
         console.log('wfs common layout isLogin', isLogin, 'isOnChainLogin', isOnChainLogin);
-        if (!isLogin && !isOnChainLogin) {
+        if (!isLogin && !isOnChainLogin && !isTgInit) {
           router.replace('/login');
         }
 
@@ -184,7 +184,7 @@ const Layout = dynamic(
         return null;
       }
 
-      if ((isLogin || isOnChainLogin) && pathname === '/') {
+      if ((isLogin || isOnChainLogin || isTgInit) && pathname === '/') {
         return (
           <AntdLayout className="xx-wrapper flex h-full w-[100vw] flex-col overflow-hidden">
             {isMobileDevice && <Header />}
@@ -192,7 +192,15 @@ const Layout = dynamic(
               className="marketplace-content flex-1 overflow-hidden relative"
               id="marketplace-content">
               {children}
-              <div className="absolute top-0 w-full h-full bg-[#8FBC30]"></div>
+              <div
+                className="absolute top-0 w-full h-full bg-[#8FBC30]"
+                style={{
+                  backgroundImage: `url(${
+                    require(isMobileDevice
+                      ? 'assets/images/bg/playground-mobile.png'
+                      : 'assets/images/bg/playground-pc.png').default.src
+                  })`,
+                }}></div>
             </AntdLayout.Content>
           </AntdLayout>
         );

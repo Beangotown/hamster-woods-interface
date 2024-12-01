@@ -4,7 +4,7 @@ import useGetState from 'redux/state/useGetState';
 import { dispatch } from 'redux/store';
 import { toggleShowTaskModal } from 'redux/reducer/info';
 export default function Task() {
-  const { isMobile } = useGetState();
+  const { isMobile, isTgInit } = useGetState();
 
   return (
     <>
@@ -14,6 +14,7 @@ export default function Task() {
         className={`${isMobile ? styles.task : styles['task-pc']}`}
         onClick={() => {
           console.log('toggleShowTaskModal');
+          if (isTgInit) return;
           dispatch(toggleShowTaskModal());
         }}
       />

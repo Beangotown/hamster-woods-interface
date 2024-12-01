@@ -62,7 +62,7 @@ const Layout = dynamic(
         </>
       ) : (
         <>
-          {isTelegramPlatform && children}
+          {children}
           <LoadingAnimation />
           <div
             className="w-[100vw] h-[100vh] absolute top-0 left-0 !bg-cover bg-center bg-no-repeat z-[-1000]"

@@ -309,17 +309,17 @@ export default function Login() {
     onError: handleSDKLogoutOffChain,
   });
 
-  const { isLock, isLogin, isOnChainLogin, isMobile: isMobileStore, walletType } = useGetState();
+  const { isLock, isLogin, isOnChainLogin, isTgInit, isMobile: isMobileStore, walletType } = useGetState();
 
   const router = useRouter();
 
   useEffect(() => {
     console.log('wfs Login useEffect1 isLogin', isLogin, 'isOnChainLogin', isOnChainLogin);
-    if (isLogin || isOnChainLogin) {
+    if (isLogin || isOnChainLogin || isTgInit) {
       console.log('wfs Login useEffect2 isLogin', isLogin, 'isOnChainLogin', isOnChainLogin);
       router.replace('/');
     }
-  }, [isLogin, isOnChainLogin, router]);
+  }, [isLogin, isOnChainLogin, router, isTgInit]);
 
   const isInIOS = isMobile().apple.device;
 
@@ -351,11 +351,12 @@ export default function Login() {
         // Automatically obtain Telegram authorization
         isGettingTelegramAuthRef.current = true;
         handleTeleGram();
+        store.dispatch(setLoginStatus(LoginStatus.TG_INIT));
       } else if (isPortkeyApp()) {
         handlePortKey();
       }
     }
-  }, [isLock, handleTeleGram, handlePortKey, isTelegramPlatform]);
+  }, [isLock, handleTeleGram, handlePortKey]);
 
   const handleEmail = () => {
     discoverUtils.removeDiscoverStorageSign();

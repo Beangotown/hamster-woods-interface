@@ -9,15 +9,15 @@ import { StorageUtils } from 'utils/storage.utils';
 
 export default function MyAsset() {
   const router = useRouter();
-  const { walletInfo, walletType, isLogin, isOnChainLogin, configInfo } = useGetState();
+  const { walletInfo, walletType, isLogin, isTgInit, isOnChainLogin, configInfo } = useGetState();
   const { isShowRampBuy, isShowRampSell } = configInfo!;
   useEffect(() => {
-    if (!isLogin && !isOnChainLogin) {
+    if (!isLogin && !isOnChainLogin && !isTgInit) {
       router.push('/login');
     } else if (walletType !== WalletType.portkey) {
       router.push('/');
     }
-  }, [isLogin, isOnChainLogin, router, walletType]);
+  }, [isLogin, isOnChainLogin, router, walletType, isTgInit]);
 
   const originChainId = StorageUtils.getOriginChainId() || '';
 

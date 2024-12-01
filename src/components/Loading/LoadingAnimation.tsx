@@ -36,12 +36,12 @@ export default function LoadingAnimation() {
           alt="logo"
           className={`mx-auto ${isMobile ? 'h-[240px] w-[240px]' : 'h-[480px] w-[480px]'}`}></img>
       )}
-      <img
+      {/* <img
         width={isMobile ? 285 : 480}
         src={GameComing.src}
         alt="coming"
         className={`mx-auto ${isMobile ? 'w-[285px]' : 'w-[480px]'}`}></img>
-      <Animation></Animation>
+      <Animation></Animation> */}
     </div>
   );
 }
