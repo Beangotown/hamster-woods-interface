@@ -30,7 +30,7 @@ import { StorageUtils } from 'utils/storage.utils';
 export default function Setting() {
   const [settingModalVisible, setSettingModalVisible] = useState(false);
 
-  const { walletType, isMobile, isOnChainLogin, needSync } = useGetState();
+  const { walletType, isMobile, isOnChainLogin, needSync, isTgInit } = useGetState();
   const [syncLoading, setSyncLoading] = useState(false);
 
   const handleCancel = () => {
@@ -43,6 +43,7 @@ export default function Setting() {
   };
 
   const handleSetting = () => {
+    if (isTgInit) return;
     setSettingModalVisible(true);
   };
 

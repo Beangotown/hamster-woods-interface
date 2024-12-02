@@ -1,3 +1,4 @@
+import { TelegramPlatform } from '@portkey/did-ui-react';
 import dayjs from 'dayjs';
 
 export const sleep = (time: number) => {
@@ -17,3 +18,5 @@ export function isValidNumber(n: string) {
 export function isJWTExpired(expiredTimestamp: number) {
   return dayjs(expiredTimestamp).isBefore(dayjs());
 }
+
+export const isTelegramPlatform = TelegramPlatform.isTelegramPlatform();

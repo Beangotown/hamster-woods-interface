@@ -58,4 +58,5 @@ export enum LoginStatus {
   LOGGED = 2,
   LOCK = 3,
   ON_CHAIN_LOGGED = 4,
+  TG_INIT = 5,
 }

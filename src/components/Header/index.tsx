@@ -22,7 +22,7 @@ import LoadingModal from 'components/LoadingModal';
 // import useOpenGuardianApprove from 'hooks/useOpenGuardianApprove';
 
 export default function Header() {
-  const { walletType, isOnChainLogin, needSync } = useGetState();
+  const { walletType, isOnChainLogin, needSync, isTgInit } = useGetState();
   const { playerInfo } = useGetState();
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const [lockedAcornsVisible, setLockedAcornsVisible] = useState(false);
@@ -126,7 +126,10 @@ export default function Header() {
         <div className="flex-grow"></div>
         <Image
           height={40}
-          onClick={() => setLockedAcornsVisible(true)}
+          onClick={() => {
+            if (isTgInit) return;
+            setLockedAcornsVisible(true);
+          }}
           src={HeaderLockImage}
           alt="bean"
           className="h-[40px]  w-[40px]"

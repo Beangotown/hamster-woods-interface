@@ -36,7 +36,7 @@ function Board({
   showLockedAcorns,
   purchasedChancesCount,
 }: IBoard) {
-  const { isMobile, playerInfo } = useGetState();
+  const { isMobile, playerInfo, isTgInit } = useGetState();
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const tooltipRef = useRef<any>(null);
 
@@ -56,6 +56,7 @@ function Board({
   }, []);
 
   const handleShowLeaderboard = useCallback(async () => {
+    if (isTgInit) return;
     try {
       await initialize();
     } catch (err) {
@@ -70,7 +71,7 @@ function Board({
     } finally {
       dispatch(toggleShowLeaderboard());
     }
-  }, [initialize]);
+  }, [initialize, isTgInit]);
 
   if (isMobile) {
     return (

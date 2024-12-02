@@ -29,6 +29,7 @@ const useGetState = () => {
     isOnChainLogin: infoState.loginStatus === LoginStatus.ON_CHAIN_LOGGED,
     isLock: infoState.loginStatus === LoginStatus.LOCK,
     isInit: infoState.loginStatus === LoginStatus.UNLOGIN,
+    isTgInit: infoState.loginStatus === LoginStatus.TG_INIT,
     walletType: infoState.walletType,
     walletInfo: infoState.walletInfo,
     assetVisible: infoState.assetVisible,

@@ -5,7 +5,6 @@ import detectProvider from '@portkey/detect-provider';
 import {
   ConfigProvider,
   DIDWalletInfo,
-  TelegramPlatform,
   did,
   getChainInfo,
   managerApprove,
@@ -33,7 +32,7 @@ import useGetState from 'redux/state/useGetState';
 import { store, useSelector } from 'redux/store';
 import { LoginStatus } from 'redux/types/reducerTypes';
 import { AccountsType, IDiscoverInfo, PortkeyInfoType, SocialLoginType, WalletInfoType, WalletType } from 'types';
-import { sleep } from 'utils/common';
+import { isTelegramPlatform, sleep } from 'utils/common';
 import discoverUtils from 'utils/discoverUtils';
 import getAccountInfoSync from 'utils/getAccountInfoSync';
 import isPortkeyApp from 'utils/inPortkeyApp';
@@ -275,8 +274,7 @@ export default function useWebLogin({ signHandle }: { signHandle?: any }) {
 
   const handleTeleGram = useCallback(() => {
     console.log('wfs clicked login button', new Date());
-    // TODO
-    TelegramPlatform.isTelegramPlatform() &&
+    isTelegramPlatform &&
       ConfigProvider.setGlobalConfig({
         globalLoadingHandler: {
           onSetLoading: (loadingInfo) => {
