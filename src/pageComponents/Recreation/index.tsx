@@ -561,7 +561,7 @@ export default function Game() {
   useEffect(() => {
     if (isTgInit) return;
     initCheckerboard();
-  }, [isTgInit, initCheckerboard]);
+  }, [isTgInit, hasNft, checkerboardData]);
 
   useEffect(() => {
     if (!isOnChainLogin && walletType === WalletType.portkey) {
