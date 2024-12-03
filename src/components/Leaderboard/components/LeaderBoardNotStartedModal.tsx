@@ -17,7 +17,10 @@ export default function LeaderBoardNotStartedModal({ open, onCancel }: ILeaderBo
         <p>Leaderboard not available now. Please stay tuned for upcoming challenges.</p>
       </div>
       <div className="mx-2">
-        <CommonBtn title="Confirm" onClick={onCancel} className={styles.confirmBtn}></CommonBtn>
+        <CommonBtn
+          title="Confirm"
+          onClick={onCancel}
+          className={`${styles.confirmBtn} ${isMobile ? '!text-[20px]' : '!text-[32px]'}`}></CommonBtn>
       </div>
     </CustomModal>
   );

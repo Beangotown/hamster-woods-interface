@@ -85,7 +85,10 @@ export default function GetBeanPassModal({ type, ...props }: BeanPassModalPropsT
       </div>
       {displayText.btnText && (
         <div className={`${isMobile ? '' : 'mx-[64px] mb-[32px]'} h-[70px] `}>
-          <CommonBtn title={displayText.btnText} onClick={props.onConfirm} className={styles.confirmBtn}></CommonBtn>
+          <CommonBtn
+            title={displayText.btnText}
+            onClick={props.onConfirm}
+            className={`${styles.confirmBtn} ${isMobile ? '!text-[20px]' : '!text-[32px]'}`}></CommonBtn>
         </div>
       )}
     </CustomModal>

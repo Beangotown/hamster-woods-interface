@@ -41,7 +41,7 @@ export default function Intro() {
             title="I know"
             className={`font-fonarto flex items-center justify-center ${
               isMobile
-                ? 'mt-[24px] text-[20px] leading-[20px] mx-[16px]'
+                ? 'mt-[24px] !text-[20px] !leading-[20px] mx-[16px]'
                 : 'mt-[40px] mx-[64px] !text-[32px] !leading-[40px] !h-[76px]  px-[32px]'
             }`}
             onClick={() => {
