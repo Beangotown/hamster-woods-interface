@@ -405,7 +405,7 @@ export default function GetChanceModal({
             onClick={undefined}
             className={`flex justify-center items-center ${
               isMobile
-                ? 'text-[20px] leading-[20px] mt-[24px] h-[48px] mb-[16px]'
+                ? '!text-[20px] leading-[20px] mt-[24px] h-[48px] mb-[16px]'
                 : '!text-[32px] !leading-[40px] mt-[40px] !h-[76px] mx-[64px] mb-[32px]'
             }`}
           />
@@ -415,7 +415,7 @@ export default function GetChanceModal({
             onClick={notEnoughAcorns ? onEnterTransfer : handleConfirm}
             className={`flex justify-center items-center font-paytone ${
               isMobile
-                ? 'text-[20px] leading-[20px] mt-[24px] h-[48px] mb-[16px]'
+                ? '!text-[20px] leading-[20px] mt-[24px] h-[48px] mb-[16px]'
                 : '!text-[32px] !leading-[40px] mt-[40px] !h-[76px] mx-[64px] mb-[32px]'
             }`}
           />

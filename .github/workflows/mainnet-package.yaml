@@ -1,10 +1,10 @@
-name: Build and Push Image
+name: Build and Push Image - mainnet
 on:
   push:
     tags:
       - 'v*.*.*'
 jobs:
-  build-and-push-image:
+  build-and-push-image-mainnet:
     runs-on: beangotown-runner
     permissions:
       contents: read
