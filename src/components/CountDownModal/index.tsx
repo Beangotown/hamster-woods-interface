@@ -36,7 +36,7 @@ export default function CountDownModal({ onCancel, open, onConfirm, btnText }: C
         title={btnText || 'Confirm'}
         className={`flex justify-center items-center font-paytone ${
           isMobile
-            ? 'text-[20px] leading-[20px] mt-[24px] h-[48px]'
+            ? '!text-[20px] !leading-[20px] mt-[24px] h-[48px]'
             : '!text-[32px] !leading-[40px] mt-[40px] !h-[76px] mx-[64px]'
         }`}
         onClick={onConfirm}
