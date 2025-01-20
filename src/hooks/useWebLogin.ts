@@ -1,5 +1,6 @@
 'use client';
 import { ETransferConfig, WalletTypeEnum } from '@etransfer/ui-react';
+import { useConnect } from '@portkey/connect-web-wallet';
 import { getContractBasic } from '@portkey/contracts';
 import detectProvider from '@portkey/detect-provider';
 import {
@@ -60,6 +61,8 @@ export default function useWebLogin({ signHandle }: { signHandle?: any }) {
   const { loginStatus } = useSelector(selectInfo);
   const [wallet, setWallet] = useState<WalletInfoType | null>(null);
   const [_curWalletType, setCurWalletType] = useState<WalletType>(WalletType.unknown);
+  const webWallet = useConnect();
+  console.log('webWallet', webWallet);
 
   const [discoverProvider, setDiscoverProvider] = useState<IPortkeyProvider>();
   const [discoverDetected, setDiscoverDetected] = useState<DiscoverDetectState>('unknown');
