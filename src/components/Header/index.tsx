@@ -19,6 +19,7 @@ import { handleErrorMessage } from '@portkey/did-ui-react';
 import { useQueryAuthToken } from 'hooks/authToken';
 import Task from './components/Task';
 import LoadingModal from 'components/LoadingModal';
+import { isTelegramPlatform } from 'utils/common';
 // import useOpenGuardianApprove from 'hooks/useOpenGuardianApprove';
 
 export default function Header() {
@@ -56,7 +57,7 @@ export default function Header() {
 
   const showDepositModal = useCallback(async () => {
     try {
-      if ((!isOnChainLogin && walletType === WalletType.portkey) || needSync) {
+      if ((!isOnChainLogin && walletType === WalletType.portkey && isTelegramPlatform) || needSync) {
         return setSyncLoading(true);
       }
       // if (openGuardianApprove()) {

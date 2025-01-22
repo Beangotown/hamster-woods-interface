@@ -12,7 +12,7 @@ export function useAddress() {
     if (walletType === WalletType.discover) {
       setAddress(walletInfo?.discoverInfo?.address || '');
     } else if (walletType === WalletType.portkey) {
-      setAddress(walletInfo?.portkeyInfo?.caInfo?.caAddress || '');
+      setAddress(walletInfo?.portkeyInfo?.caAddress || '');
     }
   }, [walletInfo, walletType]);
 

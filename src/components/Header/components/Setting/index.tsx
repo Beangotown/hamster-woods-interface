@@ -18,8 +18,8 @@ import {
 import { LoginStatus } from 'redux/types/reducerTypes';
 import useGetState from 'redux/state/useGetState';
 import { WalletType } from 'types/index';
-import { did, TelegramPlatform } from '@portkey/did-ui-react';
-import { ChainId } from '@portkey/provider-types';
+import { singleMessage, TelegramPlatform } from '@portkey/did-ui-react';
+import { MethodsWallet } from '@portkey/provider-types';
 import ContractRequest from 'contract/contractRequest';
 import { setChessboardResetStart, setChessboardTotalStep, setCurChessboardNode } from 'redux/reducer/chessboardData';
 import showMessage from 'utils/setGlobalComponentsInfo';
@@ -27,11 +27,14 @@ import CustomModal from 'components/CustomModal';
 import CommonRedBtn from 'components/CommonRedBtn';
 import LoadingModal from 'components/LoadingModal';
 import { StorageUtils } from 'utils/storage.utils';
+import { useConnect } from '@portkey/connect-web-wallet';
+import { isTelegramPlatform } from 'utils/common';
 export default function Setting() {
   const [settingModalVisible, setSettingModalVisible] = useState(false);
 
   const { walletType, isMobile, isOnChainLogin, needSync, isTgInit } = useGetState();
   const [syncLoading, setSyncLoading] = useState(false);
+  const { disconnect, provider } = useConnect();
 
   const handleCancel = () => {
     setSettingModalVisible(false);
@@ -49,43 +52,40 @@ export default function Setting() {
 
   const router = useRouter();
 
-  const handleLock = useCallback(() => {
+  const handleLock = useCallback(async () => {
     if (walletType === WalletType.discover) {
       return;
     }
     ContractRequest.get().resetConfig();
-    did.reset();
-    console.log('wfs setLoginStatus=>2');
+    if (!provider) {
+      singleMessage.error('provider is not ready');
+      return;
+    }
+    await provider?.request({
+      method: MethodsWallet.WALLET_LOCK,
+      payload: { data: Date.now().toString() },
+    });
     store.dispatch(setLoginStatus(LoginStatus.LOCK));
     store.dispatch(setCurChessboardNode(null));
     store.dispatch(setChessboardResetStart(true));
     store.dispatch(setChessboardTotalStep(0));
-  }, [walletType]);
+  }, [provider, walletType]);
 
   const handleExit = async () => {
-    if ((!isOnChainLogin && walletType === WalletType.portkey) || needSync) {
+    if (
+      (!isOnChainLogin && walletType === WalletType.portkey && isTelegramPlatform && isTelegramPlatform) ||
+      needSync
+    ) {
       return setSyncLoading(true);
     }
     showMessage.loading('Signing out of Hamster Woods');
     if (walletType === WalletType.portkey) {
-      StorageUtils.removeWallet();
-      const originChainId = StorageUtils.getOriginChainId();
-      if (originChainId) {
-        try {
-          await did.logout({
-            chainId: originChainId as ChainId,
-          });
-          did.reset();
-        } catch (error) {
-          console.error('portkey: error', error);
-        }
-      }
+      await disconnect();
     } else if (walletType === WalletType.discover) {
       window.localStorage.removeItem(LOGIN_EARGLY_KEY);
     }
-
     setSettingModalVisible(false);
-    console.log('wfs setLoginStatus=>3');
+    StorageUtils.removeWallet();
     store.dispatch(setLoginStatus(LoginStatus.UNLOGIN));
     store.dispatch(setWalletInfo(null));
     store.dispatch(setWalletType(WalletType.unknown));

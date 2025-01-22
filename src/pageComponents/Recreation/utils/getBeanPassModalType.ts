@@ -1,6 +1,5 @@
 import { getHamsterPassClaimClaimable } from 'api/request';
 import { GetBeanPassStatus } from 'components/CommonModal/type';
-import { store } from 'redux/store';
 import { BeanPassReasons } from 'types';
 import { sleep } from 'utils/common';
 import showMessage from 'utils/setGlobalComponentsInfo';
@@ -14,9 +13,7 @@ interface IProps {
 export const getBeanPassModalType: (params: IProps) => Promise<false | GetBeanPassStatus> = async ({
   address,
   reTryCounts,
-  doubleClaimCallback,
 }: IProps) => {
-  const open = store.getState().noticeModal.noticeModal?.open;
   let beanPassClaimClaimableRes;
   let beanPassModalType = GetBeanPassStatus.Abled;
   try {
@@ -53,10 +50,6 @@ export const getBeanPassModalType: (params: IProps) => Promise<false | GetBeanPa
       beanPassModalType = GetBeanPassStatus.Recharge;
     } else if (reason === BeanPassReasons.DoubleClaim) {
       beanPassModalType = GetBeanPassStatus.Notfound;
-      if (open) {
-        doubleClaimCallback && doubleClaimCallback();
-        return false;
-      }
     }
   }
 

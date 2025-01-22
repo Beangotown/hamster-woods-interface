@@ -1,7 +1,7 @@
 'use client';
 import { Layout as AntdLayout } from 'antd';
 import Header from 'components/Header';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 // import 'utils/firebase';
 
@@ -26,6 +26,8 @@ import { LoginStatus } from 'redux/types/reducerTypes';
 import { getCurrentIp } from 'utils/ip';
 import { StorageUtils } from 'utils/storage.utils';
 import { isTelegramPlatform } from 'utils/common';
+import { useConnect } from '@portkey/connect-web-wallet';
+import { MethodsWallet } from '@portkey/provider-types';
 
 did.setConfig({
   referralInfo: {
@@ -62,6 +64,7 @@ const Layout = dynamic(
       const { isInit, isLogin, isOnChainLogin, isTgInit } = useGetState();
       const [isMobileDevice, setIsMobileDevice] = useState(false);
       const [isFetchFinished, setIsFetchFinished] = useState(false);
+      const { provider } = useConnect();
 
       const router = useRouter();
 
@@ -94,19 +97,29 @@ const Layout = dynamic(
         };
       }, []);
 
+      // const checkNeedLock = useCallback(async () => {
+      //   const state = await provider?.request({
+      //     method: MethodsWallet.GET_WALLET_STATE,
+      //   });
+      //   if (state?.isLogged) {
+      //     if (!state.isConnected) {
+      //       provider?.request({
+      //         method: MethodsWallet.WALLET_LOCK,
+      //         payload: { data: Date.now().toString() },
+      //       });
+      //       store.dispatch(setLoginStatus(LoginStatus.LOCK));
+      //     }
+      //   }
+      // }, [provider]);
+
       useEffect(() => {
-        console.log('wfs common layout isLogin', isLogin, 'isOnChainLogin', isOnChainLogin);
         if (!isLogin && !isOnChainLogin && !isTgInit) {
           router.replace('/login');
         }
 
-        if (typeof window !== undefined) {
-          if (window.localStorage.getItem(StorageUtils.getWalletKey()) && isInit) {
-            did.reset();
-            console.log('wfs setLoginStatus=>12', pathname);
-            store.dispatch(setLoginStatus(LoginStatus.LOCK));
-          }
-        }
+        // if (isInit) {
+        //   checkNeedLock();
+        // }
         // eslint-disable-next-line react-hooks/exhaustive-deps
       }, []);
 

@@ -6,9 +6,13 @@ export default class InstanceProvider {
   private static instance: IPortkeyProvider | null = null;
   private static walletInstance: WalletInfoType | null = null;
 
-  static async getDetectProvider() {
+  static async getDetectProvider(isWebWalletProvider = false) {
     if (!InstanceProvider.instance) {
-      InstanceProvider.instance = await detectProvider();
+      if (isWebWalletProvider) {
+        InstanceProvider.instance = await detectProvider({ providerName: 'PortkeyWebWallet' });
+      } else {
+        InstanceProvider.instance = await detectProvider();
+      }
     }
     return InstanceProvider.instance;
   }
