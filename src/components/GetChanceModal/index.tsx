@@ -11,7 +11,7 @@ import MinusIcon from 'assets/images/minus.png';
 import ArrowIcon from 'assets/images/arrow.png';
 import AddIcon from 'assets/images/add.png';
 import ELFIcon from 'assets/images/elf.png';
-import { isValidNumber } from 'utils/common';
+import { isTelegramPlatform, isValidNumber } from 'utils/common';
 import { useSelector } from 'redux/store';
 import { IBalance, WalletType } from 'types';
 import { ZERO, divDecimals, divDecimalsStrShow, formatAmountUSDShow } from 'utils/calculate';
@@ -29,7 +29,7 @@ import { useAddress } from 'hooks/useAddress';
 import useWebLogin from 'hooks/useWebLogin';
 import { useBalance } from 'hooks/useBalance';
 import LoadingModal from 'components/LoadingModal';
-import useOpenGuardianApprove from 'hooks/useOpenGuardianApprove';
+// import useOpenGuardianApprove from 'hooks/useOpenGuardianApprove';
 
 export type GetChanceModalPropsType = {
   onConfirm?: (n: number, chancePrice: number) => void;
@@ -51,7 +51,7 @@ export default function GetChanceModal({
   ...params
 }: ICustomModalProps & GetChanceModalPropsType) {
   const { serverConfigInfo, configInfo } = useSelector((state) => state);
-  const { updatePlayerInformation } = useWebLogin({});
+  const { updatePlayerInformation } = useWebLogin();
   const address = useAddress();
   const isMobile = useIsMobile();
   const [inputVal, setInputVal] = useState(1);
@@ -65,7 +65,7 @@ export default function GetChanceModal({
   const { getETransferAuthToken } = useQueryAuthToken();
   const getBalance = useBalance();
   const [syncLoading, setSyncLoading] = useState(false);
-  const { openGuardianApprove } = useOpenGuardianApprove();
+  // const { openGuardianApprove } = useOpenGuardianApprove();
 
   const chancePrice = useMemo(
     () => serverConfigInfo.serverConfigInfo?.chancePrice || 1,
@@ -108,18 +108,18 @@ export default function GetChanceModal({
 
   const onEnterTransfer = useCallback(async () => {
     try {
-      if ((!isOnChainLogin && walletType === WalletType.portkey) || needSync) {
+      if ((!isOnChainLogin && walletType === WalletType.portkey && isTelegramPlatform) || needSync) {
         return setSyncLoading(true);
       }
-      if (openGuardianApprove()) {
-        return;
-      }
+      // if (openGuardianApprove()) {
+      //   return;
+      // }
       await getETransferAuthToken();
       setShowDepositModal(true);
     } catch (error) {
       message.error(handleErrorMessage(error, 'Get etransfer auth token error'));
     }
-  }, [getETransferAuthToken, isOnChainLogin, needSync, openGuardianApprove, walletType]);
+  }, [getETransferAuthToken, isOnChainLogin, needSync, walletType]);
 
   const errorMessageTipDom = useCallback(() => {
     if (!errMsgTip)
@@ -183,25 +183,15 @@ export default function GetChanceModal({
 
   const handleConfirm = useCallback(() => {
     if (errMsgTip) return;
-    if ((!isOnChainLogin && walletType === WalletType.portkey) || needSync) {
+    if ((!isOnChainLogin && walletType === WalletType.portkey && isTelegramPlatform) || needSync) {
       return setSyncLoading(true);
     }
-    if (openGuardianApprove()) {
-      return;
-    }
+    // if (openGuardianApprove()) {
+    //   return;
+    // }
     if (!handleCheckPurchase()) return;
     onConfirm?.(inputVal, chancePrice);
-  }, [
-    chancePrice,
-    errMsgTip,
-    handleCheckPurchase,
-    inputVal,
-    isOnChainLogin,
-    needSync,
-    onConfirm,
-    openGuardianApprove,
-    walletType,
-  ]);
+  }, [chancePrice, errMsgTip, handleCheckPurchase, inputVal, isOnChainLogin, needSync, onConfirm, walletType]);
 
   const handleCancel = useCallback(() => {
     setInputVal(1);
@@ -378,12 +368,12 @@ export default function GetChanceModal({
               {showSwap && (
                 <div
                   onClick={() => {
-                    if ((!isOnChainLogin && walletType === WalletType.portkey) || needSync) {
+                    if ((!isOnChainLogin && walletType === WalletType.portkey && isTelegramPlatform) || needSync) {
                       return setSyncLoading(true);
                     }
-                    if (openGuardianApprove()) {
-                      return;
-                    }
+                    // if (openGuardianApprove()) {
+                    //   return;
+                    // }
                     setSwapOpen(true);
                   }}
                   className={`${

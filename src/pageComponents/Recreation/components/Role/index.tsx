@@ -3,7 +3,6 @@ import React, { ReactElement, useEffect, useRef, useState } from 'react';
 import { ANIMATION_DURATION } from 'constants/animation';
 
 import styles from './index.module.css';
-import { useDeepCompareEffect } from 'react-use';
 import useGetState from 'redux/state/useGetState';
 import beanTop from 'assets/base64/beanTop';
 import beanRight from 'assets/base64/beanRight';
@@ -116,7 +115,7 @@ function Role(props: IRole) {
     }
   }, [showAdd]);
 
-  useDeepCompareEffect(() => {
+  useEffect(() => {
     if (position) {
       switch (position.x) {
         case 0:
