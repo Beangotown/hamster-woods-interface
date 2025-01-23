@@ -525,7 +525,7 @@ export default function useWebLogin() {
     if (webWalletInfo?.managerAddress) {
       handleFinish(WalletType.portkey, webWalletInfo);
     }
-  }, [handleFinish, router, webWalletInfo, webWalletInfo?.managerAddress]);
+  }, [handleFinish, isLock, isLogin, isOnChainLogin, router, webWalletInfo, webWalletInfo?.managerAddress]);
 
   return {
     isOnChainLogin,

@@ -97,31 +97,34 @@ const Layout = dynamic(
         };
       }, []);
 
-      // const checkNeedLock = useCallback(async () => {
-      //   const state = await provider?.request({
-      //     method: MethodsWallet.GET_WALLET_STATE,
-      //   });
-      //   if (state?.isLogged) {
-      //     if (!state.isConnected) {
-      //       provider?.request({
-      //         method: MethodsWallet.WALLET_LOCK,
-      //         payload: { data: Date.now().toString() },
-      //       });
-      //       store.dispatch(setLoginStatus(LoginStatus.LOCK));
-      //     }
-      //   }
-      // }, [provider]);
+      const checkLoginState = useCallback(async () => {
+        const state = await provider?.request({
+          method: MethodsWallet.GET_WALLET_STATE,
+        });
+        console.log('checkLoginState', state);
+        if (state?.isLogged) {
+          if (!state.isConnected) {
+            store.dispatch(setLoginStatus(LoginStatus.LOCK));
+          }
+        } else {
+          store.dispatch(setLoginStatus(LoginStatus.UNLOGIN));
+        }
+      }, [provider]);
 
       useEffect(() => {
-        if (!isLogin && !isOnChainLogin && !isTgInit) {
-          router.replace('/login');
-        }
+        checkLoginState();
+      }, [checkLoginState]);
 
-        // if (isInit) {
-        //   checkNeedLock();
-        // }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-      }, []);
+      // useEffect(() => {
+      //   if (!isLogin && !isOnChainLogin && !isTgInit) {
+      //     router.replace('/login');
+      //   }
+
+      //   // if (isInit) {
+      //   //   checkNeedLock();
+      //   // }
+      //   // eslint-disable-next-line react-hooks/exhaustive-deps
+      // }, []);
 
       useEffect(() => {
         (async () => {
