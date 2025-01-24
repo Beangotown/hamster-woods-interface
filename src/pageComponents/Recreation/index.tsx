@@ -319,13 +319,14 @@ export default function Game() {
   const handlePurchase = useCallback(
     async (n: number, chancePrice: number) => {
       try {
-        showMessage.loading();
+        // showMessage.loading();
         const isApproved = await contractRequest.get().checkAllowanceAndApprove({
           approveTargetAddress: configInfo?.beanGoTownContractAddress ?? '',
           amount: n * chancePrice,
           symbol: ACORNS_TOKEN.symbol,
         });
         if (!isApproved) return;
+        showMessage.loading();
         await PurchaseChance({ value: n });
         showMessage.success('Buy $ACORNS Success');
         updatePlayerInformation(address);

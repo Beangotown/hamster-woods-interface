@@ -200,3 +200,8 @@ button {
 .swap-order-dot-line {
   border-color: #fff;
 }
+
+.ant-modal-mask,
+.ant-modal-wrap {
+  z-index: 999;
+}

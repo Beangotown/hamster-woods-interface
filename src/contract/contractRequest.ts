@@ -223,6 +223,7 @@ export default class ContractRequest {
           symbol,
           amount: approveAmount,
         });
+        console.log('ManagerApprove res', result);
         if (result?.error) throw result.error;
         return true;
       } else {
