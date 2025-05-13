@@ -64,6 +64,7 @@ import GuardianModal from 'components/Login/GuardianModal';
 // import useOpenGuardianApprove from 'hooks/useOpenGuardianApprove';
 import { getCaContractBySideChain } from 'utils/clearManagerReadonlyStatus';
 import { useConnect } from '@portkey/connect-web-wallet';
+import ShutDownModal from '../../components/CommonModal/ShutDownModal';
 
 export default function Game() {
   const [translate, setTranslate] = useState<{
@@ -796,6 +797,8 @@ export default function Game() {
       </div>
 
       <GlobalCom getChance={getChance} />
+
+      <ShutDownModal />
 
       <GuardianModal
         networkType={configInfo?.network}

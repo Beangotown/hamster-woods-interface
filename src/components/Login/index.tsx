@@ -27,6 +27,7 @@ import isMobile, { isMobileDevices } from 'utils/isMobile';
 import { Proto } from 'utils/proto';
 import styles from './style.module.css';
 import { useConnect } from '@portkey/connect-web-wallet';
+import ShutDownModal from '../CommonModal/ShutDownModal';
 
 const components = {
   phone: PhoneIcon,
@@ -279,6 +280,8 @@ export default function Login() {
         maskClosable={true}>
         {renderMoreContent()}
       </Drawer>
+
+      <ShutDownModal />
 
       <Modal
         open={modalVisible}
