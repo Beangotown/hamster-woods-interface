@@ -115,8 +115,8 @@ export const Play = async ({
     store.dispatch(setGuardianListForFirstNeedForAssetEntrance([]));
 
     clearManagerReadonlyStatusInMainChain(
-      store.getState().info.walletInfo?.portkeyInfo?.caInfo?.caAddress,
-      store.getState().info.walletInfo?.portkeyInfo?.caInfo?.caHash,
+      store.getState().info.walletInfo?.portkeyInfo?.caAddress,
+      store.getState().info.walletInfo?.portkeyInfo?.caHash,
       store.getState().info.guardianListForFirstNeed,
     );
     return {
@@ -172,8 +172,8 @@ export const PurchaseChance = async ({
     store.dispatch(setGuardianListForFirstNeedForAssetEntrance([]));
 
     clearManagerReadonlyStatusInMainChain(
-      store.getState().info.walletInfo?.portkeyInfo?.caInfo?.caAddress,
-      store.getState().info.walletInfo?.portkeyInfo?.caInfo?.caHash,
+      store.getState().info.walletInfo?.portkeyInfo?.caAddress,
+      store.getState().info.walletInfo?.portkeyInfo?.caHash,
       store.getState().info.guardianListForFirstNeed,
     );
 

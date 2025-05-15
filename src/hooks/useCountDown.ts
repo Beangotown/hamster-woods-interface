@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { setLoadingCountdown } from 'redux/reducer/info';
 import useGetState from 'redux/state/useGetState';
 import { store } from 'redux/store';
+import { WalletType } from 'types';
 const MILLISECOND_CONVERT_SECOND = 1000;
 const SECOND_CONVERT_HOUR = 60 * 60;
 
@@ -74,9 +75,10 @@ export function convertToUtcTimestamp(timestamp: number) {
 export function useLoadingCountdown() {
   const interval = useRef<number | null>(null);
 
-  const { needSync, loadingCountdown, isOnChainLogin } = useGetState();
+  const { needSync, loadingCountdown, isOnChainLogin, walletType } = useGetState();
 
   useEffect(() => {
+    if (walletType !== WalletType.portkey) return;
     interval.current = window.setInterval(() => {
       if (!needSync && isOnChainLogin) {
         store.dispatch(setLoadingCountdown(100));
@@ -91,5 +93,5 @@ export function useLoadingCountdown() {
     return () => {
       interval.current && window.clearInterval(interval.current);
     };
-  }, [isOnChainLogin, loadingCountdown, needSync]);
+  }, [isOnChainLogin, loadingCountdown, needSync, walletType]);
 }

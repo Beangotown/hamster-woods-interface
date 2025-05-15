@@ -7,7 +7,6 @@ import { eTransferCore } from '@etransfer/core';
 import { WalletType } from 'types';
 import DetectProvider from 'utils/InstanceProvider';
 import useGetState from 'redux/state/useGetState';
-import { did } from '@portkey/did-ui-react';
 import { getAwakenWalletType, getCaHashAndOriginChainIdByWallet } from 'utils/wallet';
 import { getETransferJWT } from '@etransfer/utils';
 import { asyncStorage } from 'utils/lib';
@@ -15,10 +14,12 @@ import { ChainId } from '@portkey/types';
 import { ETransferConfig } from '@etransfer/ui-react';
 import { isJWTExpired } from 'utils/common';
 import { useETransferAccounts } from './useAddress';
-import { StorageUtils } from 'utils/storage.utils';
+import { useConnect } from '@portkey/connect-web-wallet';
+import { MethodsWallet } from '@portkey/provider-types';
 
 export function useQueryAuthToken() {
   const { walletInfo, walletType, isLogin, isOnChainLogin } = useGetState();
+  const { walletInfo: webWalletInfo, provider: webWalletProvider } = useConnect();
 
   const accounts = useETransferAccounts();
 
@@ -62,21 +63,26 @@ export function useQueryAuthToken() {
       if (!didWalletInfo) {
         throw new Error('Portkey not login');
       }
-      let signInfo = '';
-      if (params.hexToBeSign) {
-        signInfo = params.hexToBeSign;
-      } else {
-        signInfo = params.signInfo;
-      }
-      const signature = did.sign(signInfo).toString('hex');
+      if (!webWalletProvider) throw new Error('Please connect webWallet');
+      const signedMsgObject = await webWalletProvider.request({
+        method: MethodsWallet.GET_WALLET_MANAGER_SIGNATURE,
+        payload: {
+          data: params.signInfo || params.hexToBeSign,
+        },
+      });
+      const signedMsgString = [
+        signedMsgObject.r.toString(16, 64),
+        signedMsgObject.s.toString(16, 64),
+        `0${signedMsgObject.recoveryParam.toString()}`,
+      ].join('');
       return {
         error: 0,
         errorMessage: '',
-        signature,
+        signature: signedMsgString,
         from: 'portkey',
       };
     },
-    [walletInfo],
+    [walletInfo?.portkeyInfo, webWalletProvider],
   );
   const handleGetSignature = useCallback(async () => {
     const plainTextOrigin = `Nonce:${Date.now()}`;
@@ -98,12 +104,11 @@ export function useQueryAuthToken() {
       getSignature = getDiscoverSignature;
       address = walletInfo?.discoverInfo?.address || '';
     } else {
-      // portkey sdk
-      signInfo = Buffer.from(plainText).toString('hex');
+      // portkey web wallet
+      signInfo = Buffer.from(plainTextOrigin).toString('hex');
       getSignature = getPortKeySignature;
-      address = walletInfo?.portkeyInfo?.walletInfo?.address || '';
+      address = walletInfo?.portkeyInfo?.managerAddress || '';
     }
-    console.log('getSignature');
     const result = await getSignature({
       appName: 'Hamster Woods',
       address,
@@ -116,12 +121,11 @@ export function useQueryAuthToken() {
     getDiscoverSignature,
     getPortKeySignature,
     walletInfo?.discoverInfo?.address,
-    walletInfo?.portkeyInfo?.walletInfo?.address,
+    walletInfo?.portkeyInfo?.managerAddress,
     walletType,
   ]);
 
   const getManagerAddress = useCallback(async () => {
-    //
     let managerAddress;
     if (walletType === WalletType.discover) {
       const discoverProvider = await DetectProvider.getDetectProvider();
@@ -129,24 +133,21 @@ export function useQueryAuthToken() {
 
       managerAddress = await discoverProvider.request({ method: 'wallet_getCurrentManagerAddress' });
     } else if (walletType === WalletType.portkey) {
-      managerAddress = did.didWallet.managementAccount?.address;
+      if (!webWalletInfo) throw new Error('Please connect webWallet');
+      managerAddress = webWalletInfo.managerAddress;
     }
     if (managerAddress) return managerAddress;
     throw new Error('Please Login');
-  }, [walletType]);
+  }, [walletType, webWalletInfo]);
 
   const getCaInfo: () => Promise<{ caHash: string; originChainId: ChainId; caAddress: string }> =
     useCallback(async () => {
       if (walletType === WalletType.portkey) {
-        const originChainId = (StorageUtils.getOriginChainId() || '') as ChainId;
-
-        const caInfo = did.didWallet.aaInfo.accountInfo ?? did.didWallet.caInfo?.[originChainId];
-
-        console.log(caInfo, did.didWallet, ' did.didWallet.aaInfo==originChainId', 'originChainId', originChainId);
-
-        if (!caInfo?.caHash || !caInfo?.caAddress || !originChainId) throw new Error('You are not logged in.');
+        if (!webWalletInfo) throw new Error('You are not logged in.');
+        const { caAddress = '', caHash = '', originChainId = 'tDVV' } = webWalletInfo;
         return {
-          ...caInfo,
+          caAddress,
+          caHash,
           originChainId,
         };
       } else {
@@ -159,7 +160,7 @@ export function useQueryAuthToken() {
           caAddress,
         };
       }
-    }, [walletInfo?.discoverInfo?.address, walletType]);
+    }, [walletInfo?.discoverInfo?.address, walletType, webWalletInfo]);
 
   const getUserInfo = useCallback(
     async ({
@@ -201,8 +202,6 @@ export function useQueryAuthToken() {
     if (!walletInfo) throw new Error('Failed to obtain walletInfo information.');
     if (!isLogin && !isOnChainLogin) throw new Error('You are not logged in.');
     try {
-      // showMessage.loading();
-
       const managerAddress = await getManagerAddress();
       const { caHash, originChainId } = await getCaInfo();
       let authToken;
@@ -237,8 +236,6 @@ export function useQueryAuthToken() {
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      // showMessage.hideLoading();
     }
   }, [accounts, getCaInfo, getManagerAddress, getUserInfo, isLogin, isOnChainLogin, walletInfo, walletType]);
 

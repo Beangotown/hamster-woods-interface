@@ -6,7 +6,6 @@ import { ChainId } from '@portkey/types';
 import { store } from 'redux/store';
 import { setGuardianListForFirstNeed, setGuardianListForFirstNeedForAssetEntrance } from 'redux/reducer/info';
 import useGetState from 'redux/state/useGetState';
-import { useRouter } from 'next/navigation';
 import { CurrentFnAfterApproveType } from 'redux/types/reducerTypes';
 import {
   clearManagerReadonlyStatusInMainChain,
@@ -14,6 +13,7 @@ import {
 } from 'utils/clearManagerReadonlyStatus';
 import showMessage from 'utils/setGlobalComponentsInfo';
 import { getHamsterPassClaimClaimable } from 'api/request';
+import { useConnect } from '@portkey/connect-web-wallet';
 
 interface IGuardianModalProps {
   networkType: string;
@@ -26,8 +26,8 @@ interface IGuardianModalProps {
 const GuardianModal = ({ networkType, caHash, originChainId, targetChainId, go, getChance }: IGuardianModalProps) => {
   const { currentFnAfterApprove, walletInfo } = useGetState();
   const [showGuardianApprovalModal, setShowGuardianApprovalModal] = useState(false);
-  const router = useRouter();
   const guardianList = JSON.parse(localStorage.getItem('guardianList') || '[]');
+  const { showAsset } = useConnect();
 
   useEffect(() => {
     const setGuardianApproveHandler = (isShow: boolean) => {
@@ -45,29 +45,29 @@ const GuardianModal = ({ networkType, caHash, originChainId, targetChainId, go, 
       showMessage.loading();
       try {
         await clearManagerReadonlyStatusInMainChain(
-          walletInfo?.portkeyInfo?.caInfo?.caAddress,
-          walletInfo?.portkeyInfo?.caInfo?.caHash,
+          walletInfo?.portkeyInfo?.caAddress,
+          walletInfo?.portkeyInfo?.caHash,
           guardian,
         );
         await clearManagerReadonlyStatusInSideChain(
-          walletInfo?.portkeyInfo?.caInfo?.caAddress,
-          walletInfo?.portkeyInfo?.caInfo?.caHash,
+          walletInfo?.portkeyInfo?.caAddress,
+          walletInfo?.portkeyInfo?.caHash,
           guardian,
         );
         checkAccountInitStatusRes = await getHamsterPassClaimClaimable({
-          caAddress: walletInfo?.portkeyInfo?.caInfo?.caAddress ?? '',
+          caAddress: walletInfo?.portkeyInfo?.caAddress ?? '',
         });
         showMessage.hideLoading();
         if (checkAccountInitStatusRes) {
-          router.push('/asset');
+          showAsset();
         }
       } catch (err) {
         showMessage.hideLoading();
         console.log('checkBeanPassStatusError:', err);
-        router.push('/asset');
+        showAsset();
       }
     },
-    [router, walletInfo?.portkeyInfo?.caInfo?.caAddress, walletInfo?.portkeyInfo?.caInfo?.caHash],
+    [showAsset, walletInfo?.portkeyInfo?.caAddress, walletInfo?.portkeyInfo?.caHash],
   );
 
   const onTGSignInApprovalSuccess = useCallback(

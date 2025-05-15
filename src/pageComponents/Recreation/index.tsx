@@ -6,14 +6,14 @@ import styles from './index.module.css';
 
 import Checkerboard from './components/Checkerboard';
 import Role from './components/Role';
-import { CurrentFnAfterApproveType } from 'redux/types/reducerTypes';
+// import { CurrentFnAfterApproveType } from 'redux/types/reducerTypes';
 
 import Board from './components/Board';
 import GoButton, { Status } from './components/GoButton';
 import { ANIMATION_DURATION } from 'constants/animation';
 import useGetState from 'redux/state/useGetState';
 import RecreationModal, { RecreationModalType } from './components/RecreationModal';
-import { useDebounce, useDeepCompareEffect, useWindowSize } from 'react-use';
+import { useDebounce, useWindowSize } from 'react-use';
 import { GetBeanPassStatus, ShowBeanPassType } from 'components/CommonModal/type';
 import GetBeanPassModal from 'components/CommonModal/GetBeanPassModal';
 import { useAddress } from 'hooks/useAddress';
@@ -26,14 +26,14 @@ import {
   setCurBeanPass,
   setPlayerInfo,
   setIsManagerReadOnly,
-  setCurrentFnAfterApprove,
+  // setCurrentFnAfterApprove,
   setIsManagerReadOnlyIsExecuteEnd,
 } from 'redux/reducer/info';
 import { IBalance, IBeanPassListItem, IContractError, WalletType } from 'types';
 import ShowNFTModal from 'components/CommonModal/ShowNFTModal';
 import { dispatch, store } from 'redux/store';
 import { TargetErrorType, formatErrorMsg } from 'utils/formattError';
-import { sleep } from 'utils/common';
+import { isTelegramPlatform, sleep } from 'utils/common';
 import { setChessboardResetStart, setChessboardTotalStep, setCurChessboardNode } from 'redux/reducer/chessboardData';
 import { getTxResultRetry } from 'utils/getTxResult';
 import { ChainId } from '@portkey/types';
@@ -42,7 +42,6 @@ import BoardRight from './components/BoardRight';
 import { SECONDS_60 } from 'constants/time';
 import { DEFAULT_SYMBOL, RoleImg } from 'constants/role';
 import { getBeanPassModalType } from './utils/getBeanPassModalType';
-import { setNoticeModal } from 'redux/reducer/noticeModal';
 import GlobalCom from './components/GlobalCom';
 import CheckerboardBottom from './components/CheckerboardBottom';
 import play from './utils/play';
@@ -57,18 +56,17 @@ import { addPrefixSuffix } from 'utils/addressFormatting';
 import { checkerboardData } from 'constants/checkerboardData';
 import DepositModal from 'components/Deposit';
 import { message } from 'antd';
-import { handleErrorMessage, did } from '@portkey/did-ui-react';
+import { handleErrorMessage } from '@portkey/did-ui-react';
 import { useQueryAuthToken } from 'hooks/authToken';
 import LoadingModal from 'components/LoadingModal';
 import { useLoadingCountdown } from 'hooks/useCountDown';
 import GuardianModal from 'components/Login/GuardianModal';
-import useOpenGuardianApprove from 'hooks/useOpenGuardianApprove';
+// import useOpenGuardianApprove from 'hooks/useOpenGuardianApprove';
 import { getCaContractBySideChain } from 'utils/clearManagerReadonlyStatus';
+import { useConnect } from '@portkey/connect-web-wallet';
+import ShutDownModal from '../../components/CommonModal/ShutDownModal';
 
 export default function Game() {
-  useEffect(() => {
-    console.log('wfs render Game page', new Date(), isLogin, isOnChainLogin);
-  }, []);
   const [translate, setTranslate] = useState<{
     x: number;
     y: number;
@@ -79,7 +77,7 @@ export default function Game() {
   const { width, height } = useWindowSize();
   const address = useAddress();
   const router = useRouter();
-  const { initializeContract, updatePlayerInformation, syncAccountInfo } = useWebLogin({});
+  const { initializeContract, updatePlayerInformation, syncAccountInfo } = useWebLogin();
   const { getETransferAuthTokenFromApi } = useQueryAuthToken();
 
   const {
@@ -99,7 +97,6 @@ export default function Game() {
     checkerboardCounts,
     curBeanPass,
   } = useGetState();
-  // console.log('wfs render Game page out', new Date(), isLogin, isOnChainLogin);
   const { getETransferAuthToken } = useQueryAuthToken();
 
   const [beanPassInfoDto, setBeanPassInfoDto] = useState<IBeanPassListItem | undefined>(curBeanPass);
@@ -158,6 +155,8 @@ export default function Game() {
   const [assetBalance, setAssetBalance] = useState<IBalance[]>([]);
 
   const [syncLoading, setSyncLoading] = useState(false);
+  const { showAsset } = useConnect();
+
   useLoadingCountdown();
   const translateRef = useRef<{
     x: number;
@@ -167,7 +166,7 @@ export default function Game() {
     y: 0,
   });
 
-  const { openGuardianApprove } = useOpenGuardianApprove();
+  // const { openGuardianApprove } = useOpenGuardianApprove();
 
   const updateStep = () => {
     store.dispatch(
@@ -298,13 +297,13 @@ export default function Game() {
   const getChance = useCallback(
     async (needCheck = true) => {
       console.log('wfs----LoadingModal---getChance');
-      if ((!isOnChainLogin && walletType === WalletType.portkey) || needSync) {
+      if ((!isOnChainLogin && walletType === WalletType.portkey && isTelegramPlatform) || needSync) {
         return setSyncLoading(true);
       }
-      if (needCheck && openGuardianApprove()) {
-        store.dispatch(setCurrentFnAfterApprove(CurrentFnAfterApproveType.GET_CHANCE));
-        return;
-      }
+      // if (needCheck && openGuardianApprove()) {
+      //   store.dispatch(setCurrentFnAfterApprove(CurrentFnAfterApproveType.GET_CHANCE));
+      //   return;
+      // }
       if (!playerInfo?.weeklyPurchasedChancesCount) {
         purchaseNoticeTypeRef.current = PurchaseNoticeEnum.getChance;
         setPurchaseNoticeVisible(true);
@@ -315,15 +314,7 @@ export default function Game() {
       updateAssetBalance();
       setGetChanceModalVisible(true);
     },
-    [
-      isOnChainLogin,
-      needSync,
-      openGuardianApprove,
-      playerInfo?.weeklyPurchasedChancesCount,
-      updateAssetBalance,
-      updatePrice,
-      walletType,
-    ],
+    [isOnChainLogin, needSync, playerInfo?.weeklyPurchasedChancesCount, updateAssetBalance, updatePrice, walletType],
   );
 
   const handlePurchase = useCallback(
@@ -352,17 +343,17 @@ export default function Game() {
 
   const go = async (needCheck = true) => {
     console.log('wfs----LoadingModal--go', isOnChainLogin, needCheck, needSync);
-    if ((!isOnChainLogin && walletType === WalletType.portkey) || needSync) {
+    if ((!isOnChainLogin && walletType === WalletType.portkey && isTelegramPlatform) || needSync) {
       return setSyncLoading(true);
     }
     // if (isManagerReadOnly && guardianListForFirstNeed?.length === 0 && walletType === WalletType.portkey) {
     //   EE.emit('SET_GUARDIAN_APPROVAL_MODAL', true);
     //   return;
     // }
-    if (needCheck && openGuardianApprove()) {
-      store.dispatch(setCurrentFnAfterApprove(CurrentFnAfterApproveType.GO));
-      return;
-    }
+    // if (needCheck && openGuardianApprove()) {
+    //   store.dispatch(setCurrentFnAfterApprove(CurrentFnAfterApproveType.GO));
+    //   return;
+    // }
     if (goStatus !== Status.NONE) {
       if (!hasNft) {
         onNftClick();
@@ -419,26 +410,10 @@ export default function Game() {
     setGoLoading(false);
   };
 
-  const doubleClaimCallback = () => {
-    dispatch(
-      setNoticeModal({
-        onCancel: () => {
-          dispatch(
-            setNoticeModal({
-              open: false,
-            }),
-          );
-          setBeanPassModalType(GetBeanPassStatus.Notfound);
-          setBeanPassModalVisible(true);
-        },
-      }),
-    );
-  };
-
   const checkBeanPassStatus = useCallback(async () => {
     if (address) {
       showMessage.loading(TargetErrorType.Error7);
-      const res = await getBeanPassModalType({ address, doubleClaimCallback, reTryCounts: 4 });
+      const res = await getBeanPassModalType({ address, reTryCounts: 4 });
       if (res) {
         setBeanPassModalType(res);
         setBeanPassModalVisible(true);
@@ -491,7 +466,7 @@ export default function Game() {
       if (walletType === WalletType.discover || walletType === WalletType.unknown) {
         return;
       }
-      router.push('/asset');
+      await showAsset();
     } else {
       setBeanPassModalVisible(false);
     }
@@ -503,18 +478,18 @@ export default function Game() {
 
   const showDepositModal = useCallback(async () => {
     try {
-      if ((!isOnChainLogin && walletType === WalletType.portkey) || needSync) {
+      if ((!isOnChainLogin && walletType === WalletType.portkey && isTelegramPlatform) || needSync) {
         return setSyncLoading(true);
       }
-      if (openGuardianApprove()) {
-        return;
-      }
+      // if (openGuardianApprove()) {
+      //   return;
+      // }
       await getETransferAuthToken();
       setDepositVisible(true);
     } catch (error) {
       message.error(handleErrorMessage(error, 'Get etransfer auth token error'));
     }
-  }, [getETransferAuthToken, isOnChainLogin, needSync, openGuardianApprove, walletType]);
+  }, [getETransferAuthToken, isOnChainLogin, needSync, walletType]);
 
   const handleHasNft = useCallback(
     (hasNft: boolean) => {
@@ -537,18 +512,6 @@ export default function Game() {
   }, [isLogin, isOnChainLogin, needSync, syncAccountInfo]);
 
   useEffect(() => {
-    console.log(
-      'wfs----LoadingModal1',
-      isLogin,
-      'isOnChainLogin',
-      isOnChainLogin,
-      'walletType',
-      walletType,
-      'walletInfo',
-      walletInfo,
-      // 'needSync',
-      // needSync,
-    );
     if (!isLogin && !isOnChainLogin && !isTgInit) {
       router.push('/login');
     } else {
@@ -580,14 +543,14 @@ export default function Game() {
       }, 25);
     }
     showMessage.hideLoading();
-  }, [isOnChainLogin]);
+  }, [isOnChainLogin, walletType]);
 
   useEffect(() => {
     if (isTgInit) return;
     updateAssetBalance();
   }, [updateAssetBalance, isTgInit]);
 
-  useDeepCompareEffect(() => {
+  useEffect(() => {
     if (isTgInit) return;
     setPlayableCount(playerInfo?.playableCount || 0);
     if (!hasNft || !sumScore || moving) {
@@ -661,18 +624,10 @@ export default function Game() {
     }
     async function getIsManagerReadOnly() {
       const caIns = await getCaContractBySideChain();
-      console.log(
-        'wfs----LoadingModal---chainInfo.caContractAddress----1111',
-        caIns.address,
-        walletInfo?.portkeyInfo?.caInfo?.caHash,
-        walletInfo?.portkeyInfo?.walletInfo?.address,
-        did.didWallet.managementAccount?.address,
-        isOnChainLogin,
-      );
       try {
         const rs = await caIns.callViewMethod('IsManagerReadOnly', {
-          caHash: walletInfo?.portkeyInfo?.caInfo?.caHash,
-          manager: walletInfo?.portkeyInfo?.walletInfo?.address,
+          caHash: walletInfo?.portkeyInfo?.caHash,
+          manager: walletInfo?.portkeyInfo?.managerAddress,
         });
         console.log('wfs----LoadingModal--getIsManagerReadOnly', rs);
         store.dispatch(setIsManagerReadOnly(!!rs?.data));
@@ -683,7 +638,7 @@ export default function Game() {
       }
     }
     getIsManagerReadOnly();
-  }, [isOnChainLogin, walletInfo?.portkeyInfo?.caInfo?.caHash, walletInfo?.portkeyInfo?.walletInfo?.address]);
+  }, [isOnChainLogin, walletInfo?.portkeyInfo?.caHash, walletInfo?.portkeyInfo?.managerAddress]);
 
   return (
     <>
@@ -843,10 +798,12 @@ export default function Game() {
 
       <GlobalCom getChance={getChance} />
 
+      <ShutDownModal />
+
       <GuardianModal
         networkType={configInfo?.network}
-        caHash={walletInfo?.portkeyInfo?.caInfo?.caHash}
-        originChainId={walletInfo?.portkeyInfo?.chainId}
+        caHash={walletInfo?.portkeyInfo?.caHash}
+        originChainId={walletInfo?.portkeyInfo?.originChainId}
         targetChainId={configInfo?.curChain ?? ''}
         go={go}
         getChance={getChance}

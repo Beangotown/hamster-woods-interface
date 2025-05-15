@@ -18,7 +18,7 @@ export default function AwakenSwapModal(
 ) {
   const awakenInstanceRef = useRef<IPortkeySwapperAdapter>();
   const { open, selectTokenInSymbol, selectTokenOutSymbol, onCancel } = props;
-  const { getOptions, tokenApprove, walletType } = useWebLogin({});
+  const { getOptions, tokenApprove, walletType } = useWebLogin();
   const isMobile = useIsMobile();
   const { configInfo } = useGetState();
 

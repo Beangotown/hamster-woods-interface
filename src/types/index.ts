@@ -161,13 +161,18 @@ export interface IDIDWalletInfo {
   accountInfo: ManagerInfoType;
 }
 
-export type PortkeyInfoType = Partial<IDIDWalletInfo> & {
-  accounts?: { [key: string]: any };
-  walletInfo?: { [key: string]: any } | IBlockchainWallet;
+export type WebWalletInfoType = {
+  originChainId: ChainId;
+  caAddress: string;
+  caHash: string;
+  managerAddress: string;
+  managerPubkey: string;
+  nickName: string;
+  [key: string]: any;
 };
 
 export type WalletInfoType = {
-  portkeyInfo?: PortkeyInfoType;
+  portkeyInfo?: WebWalletInfoType;
   discoverInfo?: IDiscoverInfo;
   accountInfoSync?: Array<Manager>;
 };

@@ -9,6 +9,7 @@ import ETransferLayout from './ETransferLayout';
 import WebLoginProvider from './webLoginProvider';
 import { initConfigAndResource } from 'api/request';
 import dynamic from 'next/dynamic';
+import WebWalletProvider from './WebWalletProvider';
 
 const Provider = dynamic(
   async () =>
@@ -19,9 +20,11 @@ const Provider = dynamic(
         <>
           <StoreProvider>
             <ConfigProvider locale={enUS} autoInsertSpaceInButton={false} prefixCls={'ant'}>
-              <WebLoginProvider>
-                <ETransferLayout>{children}</ETransferLayout>
-              </WebLoginProvider>
+              <WebWalletProvider>
+                <WebLoginProvider>
+                  <ETransferLayout>{children}</ETransferLayout>
+                </WebLoginProvider>
+              </WebWalletProvider>
             </ConfigProvider>
           </StoreProvider>
         </>

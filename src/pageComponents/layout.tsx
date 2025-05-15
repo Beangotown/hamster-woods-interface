@@ -1,7 +1,7 @@
 'use client';
 import { Layout as AntdLayout } from 'antd';
 import Header from 'components/Header';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 // import 'utils/firebase';
 
@@ -26,6 +26,8 @@ import { LoginStatus } from 'redux/types/reducerTypes';
 import { getCurrentIp } from 'utils/ip';
 import { StorageUtils } from 'utils/storage.utils';
 import { isTelegramPlatform } from 'utils/common';
+import { useConnect } from '@portkey/connect-web-wallet';
+import { MethodsWallet } from '@portkey/provider-types';
 
 did.setConfig({
   referralInfo: {
@@ -62,6 +64,7 @@ const Layout = dynamic(
       const { isInit, isLogin, isOnChainLogin, isTgInit } = useGetState();
       const [isMobileDevice, setIsMobileDevice] = useState(false);
       const [isFetchFinished, setIsFetchFinished] = useState(false);
+      const { provider } = useConnect();
 
       const router = useRouter();
 
@@ -94,21 +97,34 @@ const Layout = dynamic(
         };
       }, []);
 
-      useEffect(() => {
-        console.log('wfs common layout isLogin', isLogin, 'isOnChainLogin', isOnChainLogin);
-        if (!isLogin && !isOnChainLogin && !isTgInit) {
-          router.replace('/login');
-        }
-
-        if (typeof window !== undefined) {
-          if (window.localStorage.getItem(StorageUtils.getWalletKey()) && isInit) {
-            did.reset();
-            console.log('wfs setLoginStatus=>12', pathname);
+      const checkLoginState = useCallback(async () => {
+        const state = await provider?.request({
+          method: MethodsWallet.GET_WALLET_STATE,
+        });
+        console.log('checkLoginState', state);
+        if (state?.isLogged) {
+          if (!state.isConnected) {
             store.dispatch(setLoginStatus(LoginStatus.LOCK));
           }
+        } else {
+          store.dispatch(setLoginStatus(LoginStatus.UNLOGIN));
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-      }, []);
+      }, [provider]);
+
+      useEffect(() => {
+        checkLoginState();
+      }, [checkLoginState]);
+
+      // useEffect(() => {
+      //   if (!isLogin && !isOnChainLogin && !isTgInit) {
+      //     router.replace('/login');
+      //   }
+
+      //   // if (isInit) {
+      //   //   checkNeedLock();
+      //   // }
+      //   // eslint-disable-next-line react-hooks/exhaustive-deps
+      // }, []);
 
       useEffect(() => {
         (async () => {

@@ -15,6 +15,7 @@ import useGetState from 'redux/state/useGetState';
 import { WalletType } from 'types';
 import LoadingModal from 'components/LoadingModal';
 import useOpenGuardianApprove from 'hooks/useOpenGuardianApprove';
+import { isTelegramPlatform } from 'utils/common';
 
 export default function GetMoreACORNSModal({ open, onCancel, ...props }: ICustomModalProps) {
   const { getETransferAuthToken } = useQueryAuthToken();
@@ -73,12 +74,12 @@ export default function GetMoreACORNSModal({ open, onCancel, ...props }: ICustom
             try {
               // openPage(`${configInfo?.awakenUrl}/trading/ACORNS_ELF_0.3`);
               // onCancel?.();
-              if ((!isOnChainLogin && walletType === WalletType.portkey) || needSync) {
+              if ((!isOnChainLogin && walletType === WalletType.portkey && isTelegramPlatform) || needSync) {
                 return setSyncLoading(true);
               }
-              if (openGuardianApprove()) {
-                return;
-              }
+              // if (openGuardianApprove()) {
+              //   return;
+              // }
               await getETransferAuthToken();
               setShowDeposit(true);
             } catch (error) {

@@ -1,18 +1,9 @@
 'use client';
 import React, { useEffect } from 'react';
-
 import LoadingAnimation from 'components/Loading/LoadingAnimation';
-
 import dynamic from 'next/dynamic';
-
-import { store } from 'redux/store';
-import { setLoginStatus } from 'redux/reducer/info';
-import { did } from '@portkey/did-ui-react';
-
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 import useGetState from 'redux/state/useGetState';
-import { LoginStatus } from 'redux/types/reducerTypes';
-import { StorageUtils } from 'utils/storage.utils';
 import { initVConsole } from 'utils/vconsole';
 import { isTelegramPlatform } from 'utils/common';
 
@@ -29,21 +20,11 @@ const Layout = dynamic(
 
       const { isMobile: isMobileStore } = useGetState();
 
-      const router = useRouter();
+      // const router = useRouter();
 
-      useEffect(() => {
-        if (typeof window !== undefined) {
-          if (window.localStorage.getItem(StorageUtils.getWalletKey())) {
-            did.reset();
-            console.log('wfs setLoginStatus=>1');
-            store.dispatch(setLoginStatus(LoginStatus.LOCK));
-          }
-        }
-      }, []);
-
-      useEffect(() => {
-        router.prefetch('/');
-      }, []);
+      // useEffect(() => {
+      //   router.prefetch('/');
+      // }, [router]);
 
       return !isTelegramPlatform ? (
         <>

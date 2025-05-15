@@ -2,9 +2,9 @@ import { WalletType } from 'constants/index';
 import { IPortkeyContract, getContractBasic } from '@portkey/contracts';
 import { ChainId, IContract, SendOptions } from '@portkey/types';
 import { MethodsWallet } from '@portkey/provider-types';
-import { NetworkType, did, handleErrorMessage, managerApprove } from '@portkey/did-ui-react';
+import { did, handleErrorMessage } from '@portkey/did-ui-react';
 
-import { CallContractParams, IDiscoverInfo, PortkeyInfoType, WalletInfoType } from 'types';
+import { CallContractParams, IDiscoverInfo, WalletInfoType, WebWalletInfoType } from 'types';
 import { getAElfInstance, getViewWallet } from 'utils/contractInstance';
 import { aelf } from '@portkey/utils';
 import { getTxResultRetry } from 'utils/getTxResult';
@@ -13,12 +13,10 @@ import { ChainInfo, Manager } from '@portkey/services';
 import { store } from 'redux/store';
 import { SECONDS_60 } from 'constants/time';
 import { MethodType, SentryMessageType, captureMessage } from 'utils/captureMessage';
-import getAccountInfoSync from 'utils/getAccountInfoSync';
 import { compareVersion } from 'utils/version';
 import BigNumber from 'bignumber.js';
 import { timesDecimals } from 'utils/calculate';
 import { message } from 'antd';
-import { StorageUtils } from 'utils/storage.utils';
 
 interface IContractConfig {
   chainId: ChainId;
@@ -29,7 +27,7 @@ interface IContractConfig {
 
 interface IWallet {
   discoverInfo?: IDiscoverInfo;
-  portkeyInfo?: PortkeyInfoType;
+  portkeyInfo?: WebWalletInfoType;
 }
 
 interface IViewContract {
@@ -45,7 +43,7 @@ export default class ContractRequest {
   private rpcUrl: string | undefined;
   private wallet: IWallet = {};
   public caContractProvider?: IContract;
-  public caContract?: IPortkeyContract;
+  public caContractWebWalletProvider?: IContract;
   public viewContractMap: { [x: string]: IPortkeyContract };
 
   public viewContract?: IViewContract;
@@ -76,7 +74,7 @@ export default class ContractRequest {
     this.chainId = undefined;
     this.rpcUrl = undefined;
     this.caContractProvider = undefined;
-    this.caContract = undefined;
+    this.caContractWebWalletProvider = undefined;
     this.viewContract = undefined;
     this.caAddress = undefined;
     this.caHash = undefined;
@@ -94,6 +92,7 @@ export default class ContractRequest {
         this.caAddress = wallet.discoverInfo?.address;
       } else {
         this.wallet.portkeyInfo = wallet.portkeyInfo;
+        this.caAddress = wallet.portkeyInfo?.caAddress;
       }
     }
   }
@@ -102,9 +101,8 @@ export default class ContractRequest {
     if (this.walletType === WalletType.discover) {
       this.caContractProvider = await this.getProviderCaContract(contractAddress);
     } else {
-      this.caContract = await this.getCaContract();
+      this.caContractWebWalletProvider = await this.getCaContractWebWalletProvider(contractAddress);
     }
-
     this.viewContract = await this.getViewContract(contractAddress);
   }
 
@@ -170,7 +168,7 @@ export default class ContractRequest {
       const account =
         this.walletType === WalletType.discover
           ? this.wallet?.discoverInfo?.address
-          : this.wallet?.portkeyInfo?.caInfo?.caAddress;
+          : this.wallet?.portkeyInfo?.caAddress;
       if (!account) throw Error('Please login');
       if (!this.chainId) throw Error('Something went wrong(chainId)');
 
@@ -211,32 +209,21 @@ export default class ContractRequest {
         if (result?.error) throw result.error;
         return true;
       } else if (this.walletType === WalletType.portkey) {
-        const originChainId = (StorageUtils.getOriginChainId() || 'tDVV') as ChainId;
+        const chainInfo = await this.getChainInfo(this.chainId);
+        const dp = await DetectProvider.getDetectProvider(true);
+        const chainProvider = await dp?.getChain(this.chainId as ChainId);
+        if (!chainProvider) return;
+        const portkeyContract = await getContractBasic({
+          contractAddress: chainInfo.caContractAddress,
+          chainProvider: chainProvider,
+        });
 
-        const result = await managerApprove({
-          originChainId,
+        const result = await portkeyContract.callSendMethod('ManagerApprove', '', {
+          spender: approveTargetAddress,
           symbol,
-          caHash: this.caHash || '',
           amount: approveAmount,
-          targetChainId: this.chainId,
-          networkType: (store.getState().configInfo.configInfo?.network || 'MAINNET') as NetworkType,
-          batchApproveNFT: true,
-          dappInfo: {
-            icon: '/favicon.ico',
-            href: location.origin,
-            name: 'Hamster Woods',
-          },
-          spender: approveTargetAddress,
         });
-        const portkeyContract = await this.getCaContract();
-        const approveResult = await portkeyContract?.callSendMethod('ManagerApprove', '', {
-          caHash: this.caHash || '',
-          spender: approveTargetAddress,
-          symbol: result.symbol,
-          amount: result.amount,
-          guardiansApproved: result.guardiansApproved,
-        });
-        if (approveResult.error) throw approveResult.error;
+        if (result?.error) throw result.error;
         return true;
       } else {
         throw Error('Please login or refresh page');
@@ -247,27 +234,19 @@ export default class ContractRequest {
     }
   };
 
-  private getCaContract = async () => {
-    if (!this.caContract) {
-      const chainInfo = await this.getChainInfo(this.chainId);
-      if (!chainInfo) {
-        throw new Error(`Chain is not running: ${this.chainId}`);
-      }
-
-      // TODO
-      const didWalletInfo = this.wallet.portkeyInfo!;
-      const account = aelf.getWallet(did.didWallet.managementAccount?.privateKey || '');
-      const caContract = await getContractBasic({
-        contractAddress: chainInfo.caContractAddress,
-        account,
-        rpcUrl: this.rpcUrl,
+  private getCaContractWebWalletProvider = async (contractAddress: string) => {
+    if (!this.caContractWebWalletProvider) {
+      const dp = await DetectProvider.getDetectProvider(true);
+      const chainProvider = await dp?.getChain(this.chainId as ChainId);
+      if (!chainProvider) return;
+      const contract = await getContractBasic({
+        contractAddress: contractAddress,
+        chainProvider: chainProvider,
       });
-      this.caContract = caContract;
-
-      this.caAddress = didWalletInfo?.walletInfo?.address;
-      this.caHash = didWalletInfo?.caInfo?.caHash;
+      this.caContractWebWalletProvider = contract;
+      return contract;
     }
-    return this.caContract;
+    return this.caContractWebWalletProvider;
   };
 
   public getViewContracts = async (rpcUrl: string, chainId: ChainId, address: string) => {
@@ -360,20 +339,15 @@ export default class ContractRequest {
         break;
       }
       case WalletType.portkey: {
+        const webWalletInfo = this.wallet.portkeyInfo;
         try {
-          result = await this.caContract?.callSendMethod(
-            'ManagerForwardCall',
-            this.caAddress!,
-            {
-              // guardiansApproved: store.getState().info.guardianListForFirstNeed,
-              caHash: this.caHash,
-              contractAddress: params.contractAddress,
-              methodName: params.methodName,
-              args: params.args,
-            },
-            { onMethod: 'transactionHash' },
-          );
-        } catch (error) {
+          const contract = await this.getCaContractWebWalletProvider(params.contractAddress);
+          const caAddress = webWalletInfo?.caAddress;
+          if (!caAddress) throw new Error(`Account not found in chain: ${this.chainId}`);
+          result = await contract?.callSendMethod(params.methodName, caAddress, params.args, {
+            onMethod: 'transactionHash',
+          });
+        } catch (error: any) {
           this.contractCaptureMessage(params, error, MethodType.CALLSENDMETHOD);
           return Promise.reject(error);
         }
@@ -436,21 +410,14 @@ export default class ContractRequest {
         break;
       }
       case WalletType.portkey: {
+        const webWalletInfo = this.wallet.portkeyInfo;
         try {
-          console.log('wfs----LoadingModal---guardianListForFirstNeed', store.getState().info.guardianListForFirstNeed);
-          result = await this.caContract?.callSendMethod(
-            'ManagerForwardCall',
-            this.caAddress!,
-            {
-              guardiansApproved: store.getState().info.guardianListForFirstNeed,
-              caHash: this.caHash,
-              contractAddress: params.contractAddress,
-              methodName: params.methodName,
-              args: params.args,
-            },
-            { onMethod: 'transactionHash' },
-          );
-          console.log('wfs----LoadingModal---result', result);
+          const contract = await this.getCaContractWebWalletProvider(params.contractAddress);
+          const caAddress = webWalletInfo?.caAddress;
+          if (!caAddress) throw new Error(`Account not found in chain: ${this.chainId}`);
+          result = await contract?.callSendMethod(params.methodName, caAddress, params.args, {
+            onMethod: 'transactionHash',
+          });
         } catch (error) {
           console.error('=====callSendMethodNoResult error portkey', error);
           this.contractCaptureMessage(params, error, MethodType.CALLSENDMETHOD);
@@ -529,13 +496,14 @@ export default class ContractRequest {
       }
     } else {
       try {
-        const accountSyncInfo = await getAccountInfoSync(this.chainId!, this.wallet.portkeyInfo);
-        const { holder, filteredHolders } = accountSyncInfo!;
-        if (holder && filteredHolders && filteredHolders.length) {
-          return true;
-        } else {
-          return false;
-        }
+        const webWalletProvider = await DetectProvider.getDetectProvider(true);
+        if (!webWalletProvider) throw Error('webWalletProvider not found');
+
+        const status = await webWalletProvider.request({
+          method: MethodsWallet.GET_WALLET_MANAGER_SYNC_STATUS,
+          payload: { chainId: this.chainId },
+        });
+        return !!status;
       } catch (error) {
         captureMessage({
           type: SentryMessageType.ERROR,
@@ -543,7 +511,7 @@ export default class ContractRequest {
             name: 'getSyncChainStatus',
             method: MethodType.NON,
             query: {
-              type: 'SDK',
+              type: 'webWallet',
             },
             description: error,
             walletAddress: this.caAddress,
